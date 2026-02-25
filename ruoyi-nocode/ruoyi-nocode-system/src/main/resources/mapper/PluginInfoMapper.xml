@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.PluginInfoMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.PluginInfo" id="PluginInfoResult">
+        <id property="pluginId" column="plugin_id"/>
+        <result property="pluginCode" column="plugin_code"/>
+        <result property="pluginName" column="plugin_name"/>
+        <result property="pluginVersion" column="plugin_version"/>
+        <result property="pluginDesc" column="plugin_desc"/>
+        <result property="pluginClass" column="plugin_class"/>
+        <result property="pluginProvider" column="plugin_provider"/>
+        <result property="pluginDependency" column="plugin_dependency"/>
+        <result property="pluginPath" column="plugin_path"/>
+        <result property="pluginSize" column="plugin_size"/>
+        <result property="fileHash" column="file_hash"/>
+        <result property="installType" column="install_type"/>
+        <result property="mavenGroup" column="maven_group"/>
+        <result property="mavenArtifact" column="maven_artifact"/>
+        <result property="mavenVersion" column="maven_version"/>
+        <result property="status" column="status"/>
+        <result property="runMode" column="run_mode"/>
+        <result property="autoStart" column="auto_start"/>
+        <result property="startOrder" column="start_order"/>
+        <result property="configJson" column="config_json"/>
+        <result property="lastLoadTime" column="last_load_time"/>
+        <result property="lastUnloadTime" column="last_unload_time"/>
+        <result property="errorMsg" column="error_msg"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectPluginInfoVo">
+        select plugin_id, plugin_code, plugin_name, plugin_version, plugin_desc, plugin_class, plugin_provider,
+               plugin_dependency, plugin_path, plugin_size, file_hash, install_type, maven_group, maven_artifact,
+               maven_version, status, run_mode, auto_start, start_order, config_json, last_load_time, last_unload_time,
+               error_msg, create_by, create_time, update_by, update_time, remark, del_flag
+        from nocode_plugin_info
+    </sql>
+
+    <select id="selectByPluginCode" parameterType="String" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where plugin_code = #{pluginCode} and del_flag = '0'
+    </select>
+
+    <select id="selectEnabledPlugins" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where status = 'ENABLED' and del_flag = '0'
+        order by start_order asc
+    </select>
+
+    <select id="selectAutoStartPlugins" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where auto_start = true and del_flag = '0'
+        order by start_order asc
+    </select>
+
+    <select id="selectByStatus" parameterType="String" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where status = #{status} and del_flag = '0'
+        order by start_order asc
+    </select>
+
+    <select id="checkPluginCodeUnique" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where plugin_code = #{pluginCode} and del_flag = '0'
+        <if test="pluginId != null">
+            and plugin_id != #{pluginId}
+        </if>
+        limit 1
+    </select>
+
+    <select id="selectByFileHash" parameterType="String" resultMap="PluginInfoResult">
+        <include refid="selectPluginInfoVo"/>
+        where file_hash = #{fileHash} and del_flag = '0'
+        limit 1
+    </select>
+
+</mapper>

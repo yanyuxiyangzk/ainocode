@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.PluginLogMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.PluginLog" id="PluginLogResult">
+        <id property="logId" column="log_id"/>
+        <result property="pluginId" column="plugin_id"/>
+        <result property="pluginCode" column="plugin_code"/>
+        <result property="pluginName" column="plugin_name"/>
+        <result property="operationType" column="operation_type"/>
+        <result property="operationStatus" column="operation_status"/>
+        <result property="operationDesc" column="operation_desc"/>
+        <result property="oldStatus" column="old_status"/>
+        <result property="newStatus" column="new_status"/>
+        <result property="errorMsg" column="error_msg"/>
+        <result property="operationIp" column="operation_ip"/>
+        <result property="operationBy" column="operation_by"/>
+        <result property="operationTime" column="operation_time"/>
+    </resultMap>
+
+    <sql id="selectPluginLogVo">
+        select log_id, plugin_id, plugin_code, plugin_name, operation_type, operation_status, operation_desc,
+               old_status, new_status, error_msg, operation_ip, operation_by, operation_time
+        from nocode_plugin_log
+    </sql>
+
+    <select id="selectByPluginId" parameterType="Long" resultMap="PluginLogResult">
+        <include refid="selectPluginLogVo"/>
+        where plugin_id = #{pluginId}
+        order by operation_time desc
+    </select>
+
+    <select id="selectByPluginCode" parameterType="String" resultMap="PluginLogResult">
+        <include refid="selectPluginLogVo"/>
+        where plugin_code = #{pluginCode}
+        order by operation_time desc
+    </select>
+
+    <select id="selectByOperationType" parameterType="String" resultMap="PluginLogResult">
+        <include refid="selectPluginLogVo"/>
+        where operation_type = #{operationType}
+        order by operation_time desc
+    </select>
+
+</mapper>

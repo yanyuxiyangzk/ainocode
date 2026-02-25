@@ -1,0 +1,40 @@
+@use "sass:color";
+
+// 基础颜色变量
+$menuText: #bfcbd9;
+$menuActiveText: #409eff;
+$subMenuActiveText: #f4f4f5;
+
+// 菜单背景色
+$menuBg: #304156;
+$menuHover: #263445;
+
+// 子菜单背景色
+$subMenuBg: #1f2d3d;
+$subMenuHover: #001528;
+
+// 侧边栏宽度
+$sideBarWidth: 210px;
+
+// 主题色
+$primaryColor: #409eff;
+$successColor: #67c23a;
+$warningColor: #e6a23c;
+$dangerColor: #f56c6c;
+$infoColor: #909399;
+
+// 文字颜色
+$textPrimary: #303133;
+$textRegular: #606266;
+$textSecondary: #909399;
+$textPlaceholder: #c0c4cc;
+
+// 边框颜色
+$borderColor: #dcdfe6;
+$borderColorLight: #e4e7ed;
+$borderColorLighter: #ebeef5;
+$borderColorExtraLight: #f2f6fc;
+
+// 背景色
+$bgColor: #f0f2f5;
+$bgColorPage: #f2f3f5;

@@ -1,0 +1,76 @@
+package ${packageName}.controller;
+
+import com.ruoyi.nocode.common.core.domain.AjaxResult;
+import com.ruoyi.nocode.common.core.domain.TableDataInfo;
+import ${packageName}.entity.${className};
+import ${packageName}.service.I${className}Service;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * ${functionName}Controller
+ * 
+ * @author ${author}
+ */
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+@RequiredArgsConstructor
+@Tag(name = "${functionName}", description = "${functionName}管理接口")
+public class ${className}Controller {
+
+    private final I${className}Service ${businessName}Service;
+
+    /**
+     * 查询${functionName}列表
+     */
+    @GetMapping("/list")
+    @Operation(summary = "查询列表")
+    public TableDataInfo list(${className} ${businessName}) {
+        List<${className}> list = ${businessName}Service.select${className}List(${businessName});
+        return TableDataInfo.success(list);
+    }
+
+    /**
+     * 获取${functionName}详情
+     */
+    @GetMapping("/{${pkColumn.javaField}}")
+    @Operation(summary = "获取详情")
+    public AjaxResult getInfo(@PathVariable Long ${pkColumn.javaField}) {
+        ${className} ${businessName} = ${businessName}Service.select${className}By${pkColumn.javaField?cap_first}(${pkColumn.javaField});
+        return AjaxResult.success(${businessName});
+    }
+
+    /**
+     * 新增${functionName}
+     */
+    @PostMapping
+    @Operation(summary = "新增")
+    public AjaxResult add(@RequestBody ${className} ${businessName}) {
+        boolean success = ${businessName}Service.save(${businessName});
+        return success ? AjaxResult.success("新增成功") : AjaxResult.error("新增失败");
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @PutMapping
+    @Operation(summary = "修改")
+    public AjaxResult edit(@RequestBody ${className} ${businessName}) {
+        boolean success = ${businessName}Service.updateById(${businessName});
+        return success ? AjaxResult.success("修改成功") : AjaxResult.error("修改失败");
+    }
+
+    /**
+     * 删除${functionName}
+     */
+    @DeleteMapping("/{${pkColumn.javaField}s}")
+    @Operation(summary = "删除")
+    public AjaxResult remove(@PathVariable Long[] ${pkColumn.javaField}s) {
+        boolean success = ${businessName}Service.removeBatchByIds(List.of(${pkColumn.javaField}s));
+        return success ? AjaxResult.success("删除成功") : AjaxResult.error("删除失败");
+    }
+}

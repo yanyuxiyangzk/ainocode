@@ -1,0 +1,50 @@
+# Gateway 服务专用配置
+# 请将此文件内容复制到 Nacos 配置中心
+# Data ID: ruoyi-nocode-gateway-dev.yml
+# Group: DEFAULT_GROUP
+
+spring:
+  cloud:
+    gateway:
+      # 动态路由配置（支持热更新）
+      routes:
+        # 认证服务
+        - id: ruoyi-nocode-auth
+          uri: lb://ruoyi-nocode-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+        
+        # 系统服务
+        - id: ruoyi-nocode-system
+          uri: lb://ruoyi-nocode-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@ipKeyResolver}"
+      
+      # 服务发现路由
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+# 网关限流配置
+gateway:
+  rate-limit:
+    enabled: true
+    # 每秒请求数
+    requests-per-second: 100
+    # 令牌桶容量
+    burst-capacity: 200

@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  color: #303133;
+  background-color: #f5f7fa;
+  height: 100%;
+}
+
+#app {
+  height: 100%;
+}
+
+.el-container {
+  height: 100%;
+}
+
+.el-header {
+  background: linear-gradient(135deg, #409EFF 0%, #337ecc 100%);
+  color: white;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.el-header h1 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.el-aside {
+  background-color: #304156;
+  color: #bfcbd9;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12);
+}
+
+.el-menu {
+  border-right: none;
+  background-color: transparent !important;
+}
+
+.el-menu-item:hover,
+.el-submenu__title:hover {
+  background-color: #263445 !important;
+}
+
+.el-menu-item.is-active {
+  background-color: #409EFF !important;
+  color: white !important;
+}
+
+.el-main {
+  padding: 20px;
+  background-color: #f5f7fa;
+}
+
+.el-card {
+  margin-bottom: 20px;
+}
+
+.el-card__header {
+  font-weight: 500;
+  color: #303133;
+}
+
+.api-method {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.api-method.GET { background: #67c23a; color: white; }
+.api-method.POST { background: #409EFF; color: white; }
+.api-method.PUT { background: #e6a23c; color: white; }
+.api-method.DELETE { background: #f56c6c; color: white; }
+
+.code-block {
+  background: #282c34;
+  color: #abb2bf;
+  padding: 15px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.json-key { color: #d19a66; }
+.json-string { color: #98c379; }
+.json-number { color: #d19a66; }
+.json-boolean { color: #56b6c2; }
+
+.test-result {
+  background: #f0f9eb;
+  border: 1px solid #c2e7b0;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.test-result.error {
+  background: #fef0f0;
+  border-color: #fbc4c4;
+}
+
+.el-form-item__label {
+  font-weight: 500;
+}

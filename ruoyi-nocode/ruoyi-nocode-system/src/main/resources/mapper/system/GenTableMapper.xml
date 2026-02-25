@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.GenTableMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.GenTable" id="GenTableResult">
+        <id column="table_id" property="tableId"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_comment" property="tableComment"/>
+        <result column="class_name" property="className"/>
+        <result column="package_name" property="packageName"/>
+        <result column="module_name" property="moduleName"/>
+        <result column="business_name" property="businessName"/>
+        <result column="function_name" property="functionName"/>
+        <result column="gen_type" property="genType"/>
+        <result column="gen_path" property="genPath"/>
+        <result column="pk_column" property="pkColumn"/>
+        <result column="tree_code" property="treeCode"/>
+        <result column="tree_parent_code" property="treeParentCode"/>
+        <result column="tree_name" property="treeName"/>
+        <result column="parent_menu_id" property="parentMenuId"/>
+        <result column="db_type" property="dbType"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="selectGenTableVo">
+        select table_id, table_name, table_comment, class_name, package_name, module_name, 
+               business_name, function_name, gen_type, gen_path, pk_column, tree_code,
+               tree_parent_code, tree_name, parent_menu_id, db_type, create_time, update_time
+        from gen_table
+    </sql>
+
+    <select id="selectGenTableList" parameterType="com.ruoyi.nocode.system.entity.GenTable" resultMap="GenTableResult">
+        <include refid="selectGenTableVo"/>
+        <where>
+            <if test="tableName != null and tableName != ''">
+                AND table_name like concat('%', #{tableName}, '%')
+            </if>
+            <if test="tableComment != null and tableComment != ''">
+                AND table_comment like concat('%', #{tableComment}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- PostgreSQL 查询数据库表列表 -->
+    <select id="selectDbTableList" resultType="java.util.Map">
+        select table_name as "tableName", 
+               obj_description((table_schema || '.' || table_name)::regclass) as "tableComment"
+        from information_schema.tables
+        where table_schema = 'public'
+        and table_type = 'BASE TABLE'
+        <if test="tableName != null and tableName != ''">
+            and table_name like concat('%', #{tableName}, '%')
+        </if>
+        and table_name not in (select table_name from gen_table where del_flag = '0')
+        order by table_name
+    </select>
+
+    <!-- PostgreSQL 查询表信息 -->
+    <select id="selectDbTableByName" resultType="java.util.Map">
+        select table_name as "tableName",
+               obj_description((table_schema || '.' || table_name)::regclass) as "tableComment"
+        from information_schema.tables
+        where table_schema = 'public'
+        and table_name = #{tableName}
+    </select>
+
+    <!-- PostgreSQL 查询表字段 -->
+    <select id="selectTableColumns" resultType="java.util.Map">
+        select 
+            column_name as "columnName",
+            col_description((table_schema || '.' || table_name)::regclass, ordinal_position) as "columnComment",
+            data_type as "columnType",
+            case when column_key = 'PRI' then '1' else '0' end as "isPk",
+            case when extra = 'auto_increment' then '1' else '0' end as "isIncrement",
+            is_nullable as "isNullable"
+        from (
+            select 
+                column_name,
+                ordinal_position,
+                table_name,
+                table_schema,
+                data_type,
+                is_nullable,
+                '' as column_key,
+                '' as extra
+            from information_schema.columns
+            where table_schema = 'public'
+            and table_name = #{tableName}
+        ) t
+        order by ordinal_position
+    </select>
+
+    <select id="selectGenTableColumnByTableId" resultType="java.util.Map">
+        select column_id, table_id, column_name, column_comment, column_type, java_type, java_field,
+               is_pk, is_increment, is_required, is_insert, is_edit, is_list, is_query, 
+               query_type, html_type, dict_type, sort
+        from gen_table_column
+        where table_id = #{tableId}
+        order by sort
+    </select>
+
+    <delete id="deleteGenTableById" parameterType="Long">
+        delete from gen_table where table_id = #{tableId}
+    </delete>
+
+    <delete id="deleteGenTableColumnByTableId" parameterType="Long">
+        delete from gen_table_column where table_id = #{tableId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres15:
+    # 指定 PostgreSQL 15 版本镜像（固定版本更稳定）
+    image: postgres:15
+    # 容器名称，方便管理
+    container_name: postgres15
+    # 环境变量配置
+    environment:
+      # 必须设置：PostgreSQL 超级用户密码（替换为你的强密码）
+      POSTGRES_PASSWORD: zk123456
+      # 可选：自定义用户名（默认是 postgres）
+      POSTGRES_USER: postgres
+      # 可选：初始化的默认数据库名
+      POSTGRES_DB: aicode
+      # 设置时区（避免时间差问题）
+      TZ: Asia/Shanghai
+      # 开启远程访问的核心配置（监听所有地址）
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    # 端口映射（主机端口:容器端口，若5432被占用可改为 5433:5432）
+    ports:
+      - "5432:5432"
+    # 数据卷挂载（持久化数据，容器删除数据不丢失）
+    volumes:
+      - postgres15_data:/var/lib/postgresql/data
+      # 初始化脚本挂载（可选：启动时自动执行SQL脚本）
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    # 重启策略（开机自启，容器异常退出也自动重启）
+    restart: always
+    # 网络模式（默认桥接，无需修改）
+    network_mode: bridge
+    # 资源限制（可选：防止占用过多资源）
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+# 声明数据卷（自动创建，持久化PostgreSQL数据）
+volumes:
+  postgres15_data:
+    driver: local

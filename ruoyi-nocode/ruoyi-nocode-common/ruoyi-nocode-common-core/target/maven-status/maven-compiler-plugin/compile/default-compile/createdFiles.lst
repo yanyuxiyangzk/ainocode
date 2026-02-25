@@ -1,0 +1,10 @@
+com\ruoyi\nocode\common\core\domain\BaseEntity.class
+com\ruoyi\nocode\common\plugin\extension\DataProcessorExtension$ValidationResult.class
+com\ruoyi\nocode\common\plugin\extension\NocodePlugin.class
+com\ruoyi\nocode\common\core\constant\UserConstants.class
+com\ruoyi\nocode\common\core\exception\ServiceException.class
+com\ruoyi\nocode\common\core\domain\AjaxResult.class
+com\ruoyi\nocode\common\core\domain\TableDataInfo.class
+com\ruoyi\nocode\common\plugin\extension\PluginExtensionPoint.class
+com\ruoyi\nocode\common\plugin\extension\ApiHandlerExtension.class
+com\ruoyi\nocode\common\plugin\extension\DataProcessorExtension.class

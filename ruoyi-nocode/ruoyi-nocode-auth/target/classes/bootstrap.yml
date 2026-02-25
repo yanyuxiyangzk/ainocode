@@ -1,0 +1,49 @@
+# Auth Bootstrap 配置
+# 此文件优先于 application.yml 加载，用于 Nacos 配置中心初始化
+
+spring:
+  application:
+    name: ruoyi-nocode-auth
+  
+  profiles:
+    active: @profile.active@
+  
+  cloud:
+    nacos:
+      # Nacos 配置中心 - 优先加载
+      config:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        file-extension: yml
+        # 启用配置刷新
+        refresh-enabled: true
+        # 共享配置
+        shared-configs:
+          - data-id: common.yml
+            group: ${NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+        # 扩展配置
+        extension-configs:
+          - data-id: ${spring.application.name}-${spring.profiles.active}.yml
+            group: ${NACOS_GROUP:DEFAULT_GROUP}
+            refresh: true
+      # Nacos 服务发现
+      discovery:
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        # 服务元数据
+        metadata:
+          version: 1.0.0
+          region: default
+          zone: default
+        # 心跳配置
+        heart-beat-interval: 5000
+        heart-beat-timeout: 15000
+        # 健康检查
+        healthy: true
+        enabled: true
+
+# 启用 Bootstrap 上下文
+spring.cloud.bootstrap.enabled: true

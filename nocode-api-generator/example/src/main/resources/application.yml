@@ -1,0 +1,50 @@
+# NoCode API Example Configuration
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    # 主数据源（用于应用本身的数据）
+    url: jdbc:mysql://localhost:3306/example?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        format_sql: true
+
+# NoCode API 配置
+nocode:
+  api:
+    enabled: true
+    admin:
+      enabled: true
+      port: 8081
+    datasources:
+      # 业务数据源（自动生成API的数据源）
+      - name: business
+        jdbc-url: jdbc:mysql://localhost:3306/business_db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+        username: root
+        password: your_password
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+    defaultPageSize: 10
+    maxPageSize: 1000
+
+# 日志配置
+logging:
+  level:
+    com.nocode: DEBUG
+    org.springframework: INFO

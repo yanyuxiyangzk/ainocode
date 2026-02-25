@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.GenTableColumnMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.GenTableColumn" id="GenTableColumnResult">
+        <id column="column_id" property="columnId"/>
+        <result column="table_id" property="tableId"/>
+        <result column="column_name" property="columnName"/>
+        <result column="column_comment" property="columnComment"/>
+        <result column="column_type" property="columnType"/>
+        <result column="java_type" property="javaType"/>
+        <result column="java_field" property="javaField"/>
+        <result column="is_pk" property="isPk"/>
+        <result column="is_increment" property="isIncrement"/>
+        <result column="is_required" property="isRequired"/>
+        <result column="is_insert" property="isInsert"/>
+        <result column="is_edit" property="isEdit"/>
+        <result column="is_list" property="isList"/>
+        <result column="is_query" property="isQuery"/>
+        <result column="query_type" property="queryType"/>
+        <result column="html_type" property="htmlType"/>
+        <result column="dict_type" property="dictType"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+
+    <sql id="selectGenTableColumnVo">
+        select column_id, table_id, column_name, column_comment, column_type, java_type, java_field,
+               is_pk, is_increment, is_required, is_insert, is_edit, is_list, is_query,
+               query_type, html_type, dict_type, sort
+        from gen_table_column
+    </sql>
+
+    <select id="selectGenTableColumnByTableId" parameterType="Long" resultMap="GenTableColumnResult">
+        <include refid="selectGenTableColumnVo"/>
+        where table_id = #{tableId}
+        order by sort
+    </select>
+
+    <insert id="insertGenTableColumn" parameterType="com.ruoyi.nocode.system.entity.GenTableColumn" useGeneratedKeys="true" keyProperty="columnId">
+        insert into gen_table_column (
+            table_id, column_name, column_comment, column_type, java_type, java_field,
+            is_pk, is_increment, is_required, is_insert, is_edit, is_list, is_query,
+            query_type, html_type, dict_type, sort
+        ) values (
+            #{tableId}, #{columnName}, #{columnComment}, #{columnType}, #{javaType}, #{javaField},
+            #{isPk}, #{isIncrement}, #{isRequired}, #{isInsert}, #{isEdit}, #{isList}, #{isQuery},
+            #{queryType}, #{htmlType}, #{dictType}, #{sort}
+        )
+    </insert>
+
+    <insert id="batchInsertGenTableColumn" parameterType="java.util.List">
+        insert into gen_table_column (
+            table_id, column_name, column_comment, column_type, java_type, java_field,
+            is_pk, is_increment, is_required, is_insert, is_edit, is_list, is_query,
+            query_type, html_type, dict_type, sort
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.tableId}, #{item.columnName}, #{item.columnComment}, #{item.columnType}, 
+                #{item.javaType}, #{item.javaField}, #{item.isPk}, #{item.isIncrement}, 
+                #{item.isRequired}, #{item.isInsert}, #{item.isEdit}, #{item.isList}, 
+                #{item.isQuery}, #{item.queryType}, #{item.htmlType}, #{item.dictType}, #{item.sort}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateGenTableColumn" parameterType="com.ruoyi.nocode.system.entity.GenTableColumn">
+        update gen_table_column
+        <set>
+            <if test="columnComment != null">column_comment = #{columnComment},</if>
+            <if test="javaType != null">java_type = #{javaType},</if>
+            <if test="javaField != null">java_field = #{javaField},</if>
+            <if test="isPk != null">is_pk = #{isPk},</if>
+            <if test="isIncrement != null">is_increment = #{isIncrement},</if>
+            <if test="isRequired != null">is_required = #{isRequired},</if>
+            <if test="isInsert != null">is_insert = #{isInsert},</if>
+            <if test="isEdit != null">is_edit = #{isEdit},</if>
+            <if test="isList != null">is_list = #{isList},</if>
+            <if test="isQuery != null">is_query = #{isQuery},</if>
+            <if test="queryType != null">query_type = #{queryType},</if>
+            <if test="htmlType != null">html_type = #{htmlType},</if>
+            <if test="dictType != null">dict_type = #{dictType},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </set>
+        where column_id = #{columnId}
+    </update>
+
+    <delete id="deleteGenTableColumnByTableId" parameterType="Long">
+        delete from gen_table_column where table_id = #{tableId}
+    </delete>
+
+</mapper>

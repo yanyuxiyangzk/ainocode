@@ -1,0 +1,28 @@
+package ${packageName}.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ${packageName}.entity.${className};
+import ${packageName}.mapper.${className}Mapper;
+import ${packageName}.service.I${className}Service;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * ${functionName}服务实现
+ * 
+ * @author ${author}
+ */
+@Service
+public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${className}> implements I${className}Service {
+
+    @Override
+    public List<${className}> select${className}List(${className} ${businessName}) {
+        return baseMapper.selectList(null);
+    }
+
+    @Override
+    public ${className} select${className}By${pkColumn.javaField?cap_first}(Long ${pkColumn.javaField}) {
+        return baseMapper.selectById(${pkColumn.javaField});
+    }
+}

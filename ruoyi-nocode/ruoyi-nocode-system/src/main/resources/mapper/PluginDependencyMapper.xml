@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.PluginDependencyMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.PluginDependency" id="PluginDependencyResult">
+        <id property="dependencyId" column="dependency_id"/>
+        <result property="pluginId" column="plugin_id"/>
+        <result property="dependPluginCode" column="depend_plugin_code"/>
+        <result property="dependPluginName" column="depend_plugin_name"/>
+        <result property="minVersion" column="min_version"/>
+        <result property="maxVersion" column="max_version"/>
+        <result property="required" column="required"/>
+        <result property="status" column="status"/>
+        <result property="resolveMessage" column="resolve_message"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectPluginDependencyVo">
+        select dependency_id, plugin_id, depend_plugin_code, depend_plugin_name, min_version, max_version,
+               required, status, resolve_message, create_by, create_time, update_by, update_time, remark, del_flag
+        from nocode_plugin_dependency
+    </sql>
+
+    <select id="selectByPluginId" parameterType="Long" resultMap="PluginDependencyResult">
+        <include refid="selectPluginDependencyVo"/>
+        where plugin_id = #{pluginId} and del_flag = '0'
+        order by required desc, create_time asc
+    </select>
+
+    <select id="selectDependentPlugins" parameterType="String" resultMap="PluginDependencyResult">
+        <include refid="selectPluginDependencyVo"/>
+        where depend_plugin_code = #{dependPluginCode} and del_flag = '0'
+    </select>
+
+    <delete id="deleteByPluginId" parameterType="Long">
+        update nocode_plugin_dependency
+        set del_flag = '2'
+        where plugin_id = #{pluginId}
+    </delete>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into nocode_plugin_dependency 
+        (plugin_id, depend_plugin_code, depend_plugin_name, min_version, max_version, required, status, create_by, create_time, del_flag)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.pluginId}, #{item.dependPluginCode}, #{item.dependPluginName}, 
+             #{item.minVersion}, #{item.maxVersion}, #{item.required}, #{item.status}, 
+             #{item.createBy}, CURRENT_TIMESTAMP, '0')
+        </foreach>
+    </insert>
+
+</mapper>

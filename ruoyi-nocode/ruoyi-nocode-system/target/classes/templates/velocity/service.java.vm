@@ -1,0 +1,29 @@
+package ${packageName}.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import ${packageName}.entity.${className};
+import java.util.List;
+
+/**
+ * ${functionName}服务接口
+ * 
+ * @author ${author}
+ */
+public interface I${className}Service extends IService<${className}> {
+
+    /**
+     * 查询${functionName}列表
+     *
+     * @param ${businessName} ${functionName}
+     * @return ${functionName}集合
+     */
+    List<${className}> select${className}List(${className} ${businessName});
+
+    /**
+     * 根据ID查询${functionName}
+     *
+     * @param ${pkColumn.javaField} 主键
+     * @return ${functionName}
+     */
+    ${className} select${className}By${pkColumn.javaField?cap_first}(Long ${pkColumn.javaField});
+}
