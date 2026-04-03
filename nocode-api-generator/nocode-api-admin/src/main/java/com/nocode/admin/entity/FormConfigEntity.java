@@ -28,6 +28,10 @@ public class FormConfigEntity {
     @Column(name = "form_config", columnDefinition = "TEXT")
     private String formConfig;
 
+    /** 对应数据表名 */
+    @Column(name = "table_name", length = 100)
+    private String tableName;
+
     /** 表单状态：DRAFT-草稿，PUBLISHED-已发布 */
     @Column(name = "status", length = 20)
     private String status = "DRAFT";

@@ -1,13 +1,22 @@
 package com.nocode.admin.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nocode.admin.entity.FormConfigEntity;
 import com.nocode.admin.exception.ResourceNotFoundException;
+import com.nocode.admin.exception.WorkflowException;
 import com.nocode.admin.repository.FormConfigRepository;
+import com.nocode.core.ddl.DdlGenerator;
+import com.nocode.core.entity.ApiResult;
+import com.nocode.core.entity.DatabaseType;
+import com.nocode.core.executor.SqlExecutor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -16,11 +25,14 @@ import java.util.Optional;
  * @author auto-dev
  * @since 2026-04-03
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FormConfigService {
 
     private final FormConfigRepository formConfigRepository;
+    private final SqlExecutor sqlExecutor;
+    private final ObjectMapper objectMapper;
 
     /**
      * 创建表单
@@ -86,7 +98,7 @@ public class FormConfigService {
     }
 
     /**
-     * 发布表单
+     * 发布表单 - 自动建表
      *
      * @param id 表单ID
      * @return 发布后的表单
@@ -94,12 +106,73 @@ public class FormConfigService {
     @Transactional
     public FormConfigEntity publish(Long id) {
         Optional<FormConfigEntity> existing = formConfigRepository.findById(id);
-        if (existing.isPresent()) {
-            FormConfigEntity form = existing.get();
-            form.setStatus("PUBLISHED");
-            return formConfigRepository.save(form);
+        if (existing.isEmpty()) {
+            throw new ResourceNotFoundException("Form", id);
         }
-        throw new ResourceNotFoundException("Form", id);
+
+        FormConfigEntity form = existing.get();
+
+        // 如果已经是发布状态，直接返回
+        if ("PUBLISHED".equals(form.getStatus())) {
+            return form;
+        }
+
+        // 解析表单JSON配置
+        try {
+            Map<String, Object> formConfig = objectMapper.readValue(form.getFormConfig(), Map.class);
+
+            // 生成DDL
+            String tableName = generateTableName(formConfig, form);
+            String ddl = DdlGenerator.generateDdl(formConfig, tableName, form.getName(), DatabaseType.MYSQL);
+
+            log.info("生成建表DDL: {}", ddl);
+
+            // 执行DDL创建表
+            ApiResult result = sqlExecutor.execute("default", ddl);
+            if (!result.isSuccess()) {
+                throw new WorkflowException("建表失败: " + result.getMessage());
+            }
+
+            // 更新表单状态和表名
+            form.setStatus("PUBLISHED");
+            form.setTableName(tableName);
+
+            log.info("表单[{}]发布成功，建表[{}]", form.getName(), tableName);
+
+            return formConfigRepository.save(form);
+
+        } catch (JsonProcessingException e) {
+            log.error("解析表单JSON失败", e);
+            throw new WorkflowException("解析表单配置失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据表单配置生成表名
+     */
+    private String generateTableName(Map<String, Object> formConfig, FormConfigEntity form) {
+        // 1. 优先使用formConfig中的tableName
+        Object tableName = formConfig.get("tableName");
+        if (tableName != null && !tableName.toString().trim().isEmpty()) {
+            return tableName.toString().trim();
+        }
+
+        // 2. 使用formId生成表名（添加t_前缀）
+        Object formId = formConfig.get("formId");
+        if (formId != null && !formId.toString().trim().isEmpty()) {
+            return "t_" + formId.toString().trim();
+        }
+
+        // 3. 使用表单名称生成表名
+        if (form.getName() != null && !form.getName().trim().isEmpty()) {
+            String name = form.getName().trim()
+                    .replaceAll("[^a-zA-Z0-9]", "_")
+                    .toLowerCase();
+            return "t_" + name;
+        }
+
+        // 4. 默认表名
+        return "t_form_" + form.getId();
     }
 
     /**
