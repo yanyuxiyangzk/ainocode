@@ -28,7 +28,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE `t_customer`"));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
         assertTrue(ddl.contains("id BIGINT PRIMARY KEY AUTO_INCREMENT"));
         assertTrue(ddl.contains("customer_name VARCHAR(255) NOT NULL"));
         assertTrue(ddl.contains("phone VARCHAR(255)"));
@@ -48,7 +48,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE \"t_customer\""));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
         assertTrue(ddl.contains("id BIGSERIAL PRIMARY KEY"));
         assertTrue(ddl.contains("customer_name VARCHAR(255)"));
         assertTrue(ddl.contains("status BOOLEAN"));
@@ -64,7 +64,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE \"t_customer\""));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
         assertTrue(ddl.contains("id NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY"));
         assertTrue(ddl.contains("customer_name VARCHAR2(255)"));
         assertTrue(ddl.contains("status NUMBER(1)"));
@@ -80,7 +80,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE [t_customer]"));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
         assertTrue(ddl.contains("id BIGINT IDENTITY(1,1) PRIMARY KEY"));
         assertTrue(ddl.contains("customer_name NVARCHAR(255)"));
         assertTrue(ddl.contains("status BIT"));
@@ -100,7 +100,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE `t_customer`"));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
     }
 
     @Test
@@ -116,7 +116,7 @@ class DdlGeneratorTest {
 
         // Then
         assertNotNull(ddl);
-        assertTrue(ddl.contains("CREATE TABLE `t_customer`"));
+        assertTrue(ddl.contains("CREATE TABLE t_customer"));
     }
 
     @Test

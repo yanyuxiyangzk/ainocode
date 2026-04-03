@@ -47,4 +47,21 @@ public class ApiResult {
         result.setData(data);
         return result;
     }
+
+    // 兼容success/error方法别名
+    public static ApiResult success() {
+        return ok(null);
+    }
+
+    public static ApiResult success(Object data) {
+        return ok(data);
+    }
+
+    public static ApiResult error(String message) {
+        return fail(message);
+    }
+
+    public static ApiResult error(String message, Object data) {
+        return fail(message, data);
+    }
 }
