@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "last_heartbeat": "2026-04-04T00:25:20.994608",
+  "active_pipelines": [
+    "PIPELINE-20260403-015",
+    "PIPELINE-20260403-009",
+    "PIPELINE-20260403-008",
+    "PIPELINE-20260403-005",
+    "PIPELINE-20260403-004"
+  ],
+  "pipeline_states": {},
+  "pending_tasks": [],
+  "error_queue": [],
+  "stats": {
+    "total_runs": 0,
+    "total_tasks_completed": 0,
+    "total_errors": 0
+  }
+}

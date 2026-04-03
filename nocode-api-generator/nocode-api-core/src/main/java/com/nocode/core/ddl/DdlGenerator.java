@@ -118,7 +118,7 @@ public class DdlGenerator {
         }
 
         // 根据组件类型确定SQL类型
-        String sqlType = getSqlType(type, component);
+        String sqlType = getSqlType(type, component, databaseType);
         String nullable = required ? "NOT NULL" : "NULL";
         String comment = "COMMENT '" + escapeComment(label) + "'";
 
@@ -131,7 +131,7 @@ public class DdlGenerator {
     /**
      * 根据组件类型获取SQL类型
      */
-    private static String getSqlType(String componentType, Map<String, Object> component) {
+    private static String getSqlType(String componentType, Map<String, Object> component, DatabaseType databaseType) {
         switch (componentType) {
             case "number":
             case "input-number":
@@ -141,23 +141,22 @@ public class DdlGenerator {
             case "select":
             case "radio":
             case "checkbox":
-                return "VARCHAR(100)";
+                return getVarcharType(100, databaseType);
             case "date":
                 return "DATE";
             case "datetime":
             case "time":
-                return "DATETIME";
+                return getDateTimeType(databaseType);
             case "switch":
-            case "checkbox":
-                return "TINYINT(1)";
+                return getBooleanType(databaseType);
             case "slider":
                 return "INT";
             case "cascader":
             case "tree-select":
-                return "VARCHAR(500)";
+                return getVarcharType(500, databaseType);
             case "upload":
             case "image-upload":
-                return "VARCHAR(1000)";
+                return getVarcharType(1000, databaseType);
             case "editor":
             case "rich-text":
                 return "LONGTEXT";
@@ -169,9 +168,51 @@ public class DdlGenerator {
                     if (len > 500) {
                         return "TEXT";
                     }
-                    return "VARCHAR(" + len + ")";
+                    return getVarcharType(len, databaseType);
                 }
-                return "VARCHAR(255)";
+                return getVarcharType(255, databaseType);
+        }
+    }
+
+    /**
+     * 获取布尔类型（数据库适配）
+     */
+    private static String getBooleanType(DatabaseType databaseType) {
+        switch (databaseType) {
+            case POSTGRESQL:
+                return "BOOLEAN";
+            case ORACLE:
+                return "NUMBER(1)";
+            case SQLSERVER:
+                return "BIT";
+            default:
+                return "TINYINT(1)";
+        }
+    }
+
+    /**
+     * 获取日期时间类型（数据库适配）
+     */
+    private static String getDateTimeType(DatabaseType databaseType) {
+        switch (databaseType) {
+            case ORACLE:
+                return "DATE";
+            default:
+                return "DATETIME";
+        }
+    }
+
+    /**
+     * 获取VARCHAR类型（数据库适配）
+     */
+    private static String getVarcharType(int length, DatabaseType databaseType) {
+        switch (databaseType) {
+            case ORACLE:
+                return "VARCHAR2(" + length + ")";
+            case SQLSERVER:
+                return "NVARCHAR(" + length + ")";
+            default:
+                return "VARCHAR(" + length + ")";
         }
     }
 
