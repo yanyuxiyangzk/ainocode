@@ -89,6 +89,28 @@ public class AdminController {
     }
 
     /**
+     * 测试数据源连接
+     */
+    @PostMapping("/datasources/test")
+    public ResponseEntity<Map<String, Object>> testDatasourceConnection(@RequestBody DatasourceConfig config) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            if (!StringUtils.hasText(config.getName())) {
+                result.put("success", false);
+                result.put("message", "数据源名称不能为空");
+                return ResponseEntity.badRequest().body(result);
+            }
+            Map<String, Object> testResult = configService.testConnection(config);
+            return ResponseEntity.ok(testResult);
+        } catch (Exception e) {
+            log.error("测试数据源连接失败", e);
+            result.put("success", false);
+            result.put("message", "测试失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    /**
      * 添加数据源
      */
     @PostMapping("/datasources")

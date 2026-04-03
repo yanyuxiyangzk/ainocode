@@ -4,22 +4,32 @@ import com.nocode.admin.entity.DatasourceConfigEntity;
 import com.nocode.admin.repository.DatasourceConfigRepository;
 import com.nocode.core.entity.DatabaseType;
 import com.nocode.core.entity.DatasourceConfig;
+import com.nocode.core.datasource.DatasourceRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * 数据源配置服务
  */
+@Slf4j
 @Service
 public class DatasourceConfigService {
     private final DatasourceConfigRepository repository;
+    private final DatasourceRegistry datasourceRegistry;
 
-    public DatasourceConfigService(DatasourceConfigRepository repository) {
+    public DatasourceConfigService(DatasourceConfigRepository repository, DatasourceRegistry datasourceRegistry) {
         this.repository = repository;
+        this.datasourceRegistry = datasourceRegistry;
     }
 
     /**
@@ -128,5 +138,110 @@ public class DatasourceConfigService {
         return findAllEnabled().stream()
                 .map(this::toDatasourceConfig)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 测试数据源连接
+     *
+     * @param config 数据源配置
+     * @return 测试结果
+     */
+    public Map<String, Object> testConnection(DatasourceConfig config) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("name", config.getName());
+        result.put("success", false);
+        result.put("message", "");
+
+        Connection conn = null;
+        long startTime = System.currentTimeMillis();
+
+        try {
+            Class.forName(config.getDriverClassName());
+            conn = DriverManager.getConnection(config.getJdbcUrl(), config.getUsername(), config.getPassword());
+
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            result.put("success", true);
+            result.put("message", "连接成功");
+            result.put("elapsedTime", elapsedTime);
+            result.put("catalog", conn.getCatalog());
+            result.put("databaseProductName", conn.getMetaData().getDatabaseProductName());
+            result.put("databaseProductVersion", conn.getMetaData().getDatabaseProductVersion());
+
+            log.info("数据源连接测试成功: name={}, elapsedTime={}ms", config.getName(), elapsedTime);
+        } catch (ClassNotFoundException e) {
+            result.put("message", "驱动类未找到: " + config.getDriverClassName());
+            log.error("数据源连接测试失败: name={}, error={}", config.getName(), e.getMessage());
+        } catch (SQLException e) {
+            result.put("message", "SQL异常: " + e.getMessage());
+            result.put("errorCode", e.getErrorCode());
+            result.put("sqlState", e.getSQLState());
+            log.error("数据源连接测试失败: name={}, error={}", config.getName(), e.getMessage());
+        } catch (Exception e) {
+            result.put("message", "连接失败: " + e.getMessage());
+            log.error("数据源连接测试失败: name={}, error={}", config.getName(), e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    log.warn("关闭连接失败", e);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 测试数据源连接（通过实体）
+     *
+     * @param entity 数据源配置实体
+     * @return 测试结果
+     */
+    public Map<String, Object> testConnection(DatasourceConfigEntity entity) {
+        return testConnection(toDatasourceConfig(entity));
+    }
+
+    /**
+     * 测试数据源连接（通过名称）
+     *
+     * @param name 数据源名称
+     * @return 测试结果
+     */
+    public Map<String, Object> testConnectionByName(String name) {
+        DatasourceConfigEntity entity = findByName(name);
+        if (entity == null) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("name", name);
+            result.put("success", false);
+            result.put("message", "数据源不存在: " + name);
+            return result;
+        }
+        return testConnection(entity);
+    }
+
+    /**
+     * 注册并测试数据源
+     *
+     * @param config 数据源配置
+     * @return 测试结果
+     */
+    public Map<String, Object> registerAndTestConnection(DatasourceConfig config) {
+        Map<String, Object> testResult = testConnection(config);
+
+        if ((Boolean) testResult.get("success")) {
+            datasourceRegistry.registerDatasource(config);
+            log.info("数据源注册成功: name={}", config.getName());
+        }
+
+        return testResult;
+    }
+
+    /**
+     * 刷新数据源
+     */
+    public void refreshDatasources() {
+        datasourceRegistry.refreshAll(findAllEnabledConfigs());
+        log.info("数据源已刷新");
     }
 }
