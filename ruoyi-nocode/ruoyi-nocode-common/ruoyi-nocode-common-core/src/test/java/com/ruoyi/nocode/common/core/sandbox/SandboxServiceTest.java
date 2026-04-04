@@ -205,10 +205,10 @@ class SandboxServiceTest {
         assertEquals("output", successResult.getOutput(), "输出应该匹配");
         assertEquals(100, successResult.getExecutionTime(), "执行时间应该匹配");
 
-        SandboxResult failureResult = SandboxResult.failure("error", SandboxError.SECURITY_ERROR);
+        SandboxResult failureResult = SandboxResult.failure("error");
         assertFalse(failureResult.isSuccess(), "失败结果应该success为false");
         assertEquals("error", failureResult.getError(), "错误信息应该匹配");
-        assertEquals(SandboxError.SECURITY_ERROR, failureResult.getErrorCode(), "错误码应该匹配");
+        assertEquals(SandboxError.UNKNOWN, failureResult.getErrorCode(), "错误码应该匹配");
     }
 
     @Test

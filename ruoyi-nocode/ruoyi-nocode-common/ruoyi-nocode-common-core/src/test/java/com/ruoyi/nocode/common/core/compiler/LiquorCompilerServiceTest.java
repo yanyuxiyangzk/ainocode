@@ -230,12 +230,16 @@ class LiquorCompilerServiceTest {
 
         // 验证实例方法可以正常调用
         Object instance = result.getInstance();
-        Method incrementMethod = result.getClazz().getMethod("increment");
-        Method getCounterMethod = result.getClazz().getMethod("getCounter");
+        try {
+            Method incrementMethod = result.getClazz().getMethod("increment");
+            Method getCounterMethod = result.getClazz().getMethod("getCounter");
 
-        Assertions.assertEquals(0, getCounterMethod.invoke(instance));
-        incrementMethod.invoke(instance);
-        Assertions.assertEquals(1, getCounterMethod.invoke(instance));
+            Assertions.assertEquals(0, getCounterMethod.invoke(instance));
+            incrementMethod.invoke(instance);
+            Assertions.assertEquals(1, getCounterMethod.invoke(instance));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -381,16 +385,21 @@ class LiquorCompilerServiceTest {
 
         Class<?> clazz = result.getCompiledClass();
 
-        // 验证静态字段
-        Assertions.assertEquals(100, clazz.getField("CONSTANT").get(null));
+        // 验证静态字段和方法
+        try {
+            // 验证静态字段
+            Assertions.assertEquals(100, clazz.getField("CONSTANT").get(null));
 
-        // 验证静态方法
-        Method getNextId = clazz.getMethod("getNextId");
-        Assertions.assertEquals(1, getNextId.invoke(null));
-        Assertions.assertEquals(2, getNextId.invoke(null));
+            // 验证静态方法
+            Method getNextId = clazz.getMethod("getNextId");
+            Assertions.assertEquals(1, getNextId.invoke(null));
+            Assertions.assertEquals(2, getNextId.invoke(null));
 
-        Method getType = clazz.getMethod("getType");
-        Assertions.assertEquals("STATIC_TEST", getType.invoke(null));
+            Method getType = clazz.getMethod("getType");
+            Assertions.assertEquals("STATIC_TEST", getType.invoke(null));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

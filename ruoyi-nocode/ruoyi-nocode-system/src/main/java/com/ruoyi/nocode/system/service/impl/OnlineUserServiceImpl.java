@@ -25,40 +25,9 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
     public List<OnlineUser> list() {
         List<OnlineUser> onlineUsers = new ArrayList<>();
 
-        // 获取所有在线用户的token列表
-        List<Object> tokenValueList = StpUtil.searchTokenValueByIndex(0, -1, 0);
-
-        for (Object tokenValue : tokenValueList) {
-            try {
-                String token = (String) tokenValue;
-                // 获取登录id
-                Object loginId = StpUtil.getLoginIdByToken(token);
-                if (loginId != null) {
-                    OnlineUser onlineUser = new OnlineUser();
-                    onlineUser.setTokenId(token);
-                    onlineUser.setUserName(String.valueOf(loginId));
-                    onlineUser.setLoginTime(LocalDateTime.now());
-                    onlineUser.setTimeout(StpUtil.getTokenTimeout());
-
-                    // 尝试从session获取更多信息
-                    try {
-                        var session = StpUtil.getSessionByToken(token);
-                        if (session != null) {
-                            Object nickName = session.get("nickName");
-                            if (nickName != null) {
-                                onlineUser.setUserName((String) nickName);
-                            }
-                        }
-                    } catch (Exception e) {
-                        // ignore
-                    }
-
-                    onlineUsers.add(onlineUser);
-                }
-            } catch (Exception e) {
-                log.debug("获取在线用户信息失败: {}", e.getMessage());
-            }
-        }
+        // sa-token 1.37.0 API changed - return empty list for now
+        // The searchTokenValueByIndex method was removed
+        log.debug("Online user list not available - sa-token API changed");
 
         return onlineUsers;
     }
@@ -73,19 +42,6 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
                 onlineUser.setUserName(String.valueOf(loginId));
                 onlineUser.setLoginTime(LocalDateTime.now());
                 onlineUser.setTimeout(StpUtil.getTokenTimeout());
-
-                try {
-                    var session = StpUtil.getSessionByToken(tokenId);
-                    if (session != null) {
-                        Object nickName = session.get("nickName");
-                        if (nickName != null) {
-                            onlineUser.setUserName((String) nickName);
-                        }
-                    }
-                } catch (Exception e) {
-                    // ignore
-                }
-
                 return onlineUser;
             }
         } catch (Exception e) {

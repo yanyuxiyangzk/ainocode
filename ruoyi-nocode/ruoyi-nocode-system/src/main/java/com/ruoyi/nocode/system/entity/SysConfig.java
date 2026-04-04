@@ -2,11 +2,10 @@ package com.ruoyi.nocode.system.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.nocode.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -15,9 +14,8 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_config")
-public class SysConfig implements Serializable {
+public class SysConfig extends BaseEntity {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

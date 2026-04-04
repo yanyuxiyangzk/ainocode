@@ -88,7 +88,10 @@ public class SysJobServiceImpl extends ServiceImpl<SysJobMapper, SysJob> impleme
     @Override
     public boolean checkCronExpression(String cronExpression) {
         try {
-            return CronUtil.isValid(cronExpression);
+            // CronUtil.isValid removed in newer Hutool versions
+            // Try to validate by attempting to use the pattern
+            cn.hutool.cron.pattern.CronPattern pattern = new cn.hutool.cron.pattern.CronPattern(cronExpression);
+            return pattern != null;
         } catch (Exception e) {
             return false;
         }

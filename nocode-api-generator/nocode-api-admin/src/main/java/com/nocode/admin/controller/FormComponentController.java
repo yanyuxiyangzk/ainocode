@@ -3,9 +3,10 @@ package com.nocode.admin.controller;
 import com.nocode.admin.entity.FormComponentEntity;
 import com.nocode.admin.service.FormComponentService;
 import com.nocode.core.entity.ApiResult;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,10 +14,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/form-component")
-@RequiredArgsConstructor
 public class FormComponentController {
 
     private final FormComponentService formComponentService;
+
+    @Autowired
+    public FormComponentController(FormComponentService formComponentService) {
+        this.formComponentService = formComponentService;
+    }
 
     /**
      * 创建组件
@@ -76,7 +81,7 @@ public class FormComponentController {
      */
     @GetMapping("/types")
     public ApiResult<List<String>> getComponentTypes() {
-        List<String> types = List.of(
+        List<String> types = Arrays.asList(
             "input", "textarea", "number", "select", "radio", "checkbox",
             "date", "datetime", "switch", "slider", "cascader", "upload"
         );

@@ -77,5 +77,10 @@
             <version>11.2.3.jre8</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
     </dependencies>
 </project>

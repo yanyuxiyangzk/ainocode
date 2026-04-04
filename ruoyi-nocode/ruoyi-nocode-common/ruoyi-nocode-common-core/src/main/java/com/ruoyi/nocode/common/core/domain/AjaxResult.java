@@ -94,6 +94,13 @@ public class AjaxResult extends HashMap<String, Object> implements Serializable 
     }
 
     /**
+     * 返回错误（带消息和数据）
+     */
+    public static AjaxResult error(String msg, Object data) {
+        return new AjaxResult(ERROR, msg, data);
+    }
+
+    /**
      * 判断是否成功
      */
     public boolean isSuccess() {

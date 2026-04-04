@@ -256,7 +256,13 @@ public class DatabaseBackupTask {
             // Delete empty directories
             Files.walk(backupDir)
                 .filter(Files::isDirectory)
-                .filter(p -> !Files.list(p).findAny().isPresent())
+                .filter(p -> {
+                    try {
+                        return !Files.list(p).findAny().isPresent();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
                 .forEach(p -> {
                     try {
                         Files.delete(p);

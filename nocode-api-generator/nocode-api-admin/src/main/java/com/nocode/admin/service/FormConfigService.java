@@ -107,7 +107,7 @@ public class FormConfigService {
     @Transactional
     public FormConfigEntity publish(Long id) {
         Optional<FormConfigEntity> existing = formConfigRepository.findById(id);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Form", id);
         }
 
@@ -265,7 +265,7 @@ public class FormConfigService {
     @Transactional
     public FormConfigEntity copyForm(Long id, String newName) {
         Optional<FormConfigEntity> existing = formConfigRepository.findById(id);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Form", id);
         }
         FormConfigEntity original = existing.get();

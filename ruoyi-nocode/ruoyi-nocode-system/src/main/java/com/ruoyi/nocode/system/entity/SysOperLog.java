@@ -2,10 +2,10 @@ package com.ruoyi.nocode.system.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.nocode.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_oper_log")
-public class SysOperLog extends Serializable {
+public class SysOperLog extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
