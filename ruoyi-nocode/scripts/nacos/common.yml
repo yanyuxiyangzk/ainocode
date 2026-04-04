@@ -1,0 +1,44 @@
+# Nacos 公共配置
+# 此配置会被所有服务共享引入
+
+spring:
+  # Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  # Sa-Token 配置
+  sa-token:
+    token-name: Authorization
+    timeout: 7200
+    is-concurrent: true
+    is-share: false
+    token-style: uuid
+    is-log: false
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.ruoyi.nocode: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

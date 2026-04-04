@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 表单配置实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_form_config")
 public class FormConfigEntity {
@@ -77,4 +75,32 @@ public class FormConfigEntity {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getFormConfig() { return formConfig; }
+    public void setFormConfig(String formConfig) { this.formConfig = formConfig; }
+    public String getTableName() { return tableName; }
+    public void setTableName(String tableName) { this.tableName = tableName; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public String getCreateBy() { return createBy; }
+    public void setCreateBy(String createBy) { this.createBy = createBy; }
+    public String getUpdateBy() { return updateBy; }
+    public void setUpdateBy(String updateBy) { this.updateBy = updateBy; }
+    public String getDelFlag() { return delFlag; }
+    public void setDelFlag(String delFlag) { this.delFlag = delFlag; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
 }

@@ -9,7 +9,8 @@ import com.nocode.admin.repository.WorkflowDefinitionRepository;
 import com.nocode.admin.repository.WorkflowInstanceRepository;
 import com.nocode.admin.repository.WorkflowTaskRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +25,10 @@ import java.util.Optional;
  * @author auto-dev
  * @since 2026-04-03
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkflowDefinitionService {
+    private static final Logger log = LoggerFactory.getLogger(WorkflowDefinitionService.class);
 
     private final WorkflowDefinitionRepository workflowDefinitionRepository;
     private final WorkflowInstanceRepository workflowInstanceRepository;
@@ -207,6 +208,19 @@ public class WorkflowDefinitionService {
         task.setTaskStatus("PENDING");
         task.setPriority("NORMAL");
         return workflowTaskRepository.save(task);
+    }
+
+    /**
+     * 完成任务
+     *
+     * @param instanceId 流程实例ID
+     * @param userId     办理人
+     * @param comment    审批意见
+     * @return 流程实例
+     */
+    @Transactional
+    public WorkflowInstanceEntity completeTask(Long instanceId, String userId) {
+        return completeTask(instanceId, userId, null);
     }
 
     /**

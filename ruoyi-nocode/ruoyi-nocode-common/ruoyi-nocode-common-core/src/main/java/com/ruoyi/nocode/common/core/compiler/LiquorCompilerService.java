@@ -1,6 +1,7 @@
 package com.ruoyi.nocode.common.core.compiler;
 
-import org.noear.liquor.Liquor;
+import org.noear.liquor.DynamicCompiler;
+import org.noear.liquor.DynamicClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class LiquorCompilerService {
     /**
      * 类名提取正则：public class X 或 public interface X
      */
-    private static final Pattern CLASS_NAME_PATTERN = Pattern.compile(
+    static final Pattern CLASS_NAME_PATTERN = Pattern.compile(
             "(?:public\\s+)?(?:class|interface|enum|record)\\s+(\\w+)",
             Pattern.MULTILINE
     );
@@ -107,11 +108,20 @@ public class LiquorCompilerService {
         }
 
         try {
-            // 使用Liquor进行编译
+            // 使用DynamicCompiler进行编译
             log.info("Compiling Java source: {}", className);
 
-            Liquor liquor = Liquor.newInstance(parentClassLoader);
-            Class<?> compiledClass = liquor.compile(sourceCode);
+            DynamicCompiler compiler = new DynamicCompiler(parentClassLoader);
+            compiler.addSource(className, sourceCode);
+            compiler.compile();
+
+            List<String> errors = compiler.getErrors();
+            if (!errors.isEmpty()) {
+                return LiquorCompilerResult.failure(errors, sourceCode);
+            }
+
+            DynamicClassLoader classLoader = compiler.getClassLoader();
+            Class<?> compiledClass = classLoader.loadClass(className);
 
             // 缓存结果
             if (cacheEnabled) {
@@ -221,10 +231,10 @@ public class LiquorCompilerService {
     private List<String> extractErrors(Exception e, String sourceCode) {
         List<String> errors = new ArrayList<>();
 
-        // 优先使用Liquor提供的编译错误
+        // 优先使用DynamicCompiler提供的编译错误
         String message = e.getMessage();
         if (message != null && !message.isEmpty()) {
-            // 尝试解析Liquor的错误格式
+            // 尝试解析错误格式
             for (String line : message.split("\n")) {
                 if (line.contains("error") || line.contains("Error") || line.contains("ERROR")) {
                     errors.add(line.trim());

@@ -10,7 +10,8 @@ import com.nocode.admin.repository.WorkflowDefinitionRepository;
 import com.nocode.admin.repository.WorkflowInstanceRepository;
 import com.nocode.admin.repository.WorkflowTaskRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +24,10 @@ import java.util.*;
  * @author auto-dev
  * @since 2026-04-03
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkflowTaskService {
+    private static final Logger log = LoggerFactory.getLogger(WorkflowTaskService.class);
 
     private final WorkflowTaskRepository workflowTaskRepository;
     private final WorkflowInstanceRepository workflowInstanceRepository;

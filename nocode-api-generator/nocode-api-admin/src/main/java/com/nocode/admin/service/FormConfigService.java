@@ -11,7 +11,8 @@ import com.nocode.core.entity.ApiResult;
 import com.nocode.core.entity.DatabaseType;
 import com.nocode.core.executor.SqlExecutor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +26,10 @@ import java.util.Optional;
  * @author auto-dev
  * @since 2026-04-03
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FormConfigService {
+    private static final Logger log = LoggerFactory.getLogger(FormConfigService.class);
 
     private final FormConfigRepository formConfigRepository;
     private final SqlExecutor sqlExecutor;

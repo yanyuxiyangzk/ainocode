@@ -2,23 +2,41 @@ server:
   port: 8080
 
 spring:
-  # Sentinel配置
+  application:
+    name: ruoyi-nocode-gateway
+
+  # Cloud Nacos Discovery - 服务注册与发现
   cloud:
+    nacos:
+      discovery:
+        enabled: true
+        register-enabled: true
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        metadata:
+          version: 1.0.0
+          region: default
+          zone: default
+        heart-beat-interval: 5000
+        heart-beat-timeout: 15000
+        healthy: true
+
+    # Sentinel配置
     sentinel:
       transport:
         dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8080}
       eager: true
-      # 网关限流
       scg:
         fallback:
           mode: response
-          response-body: '{"code":429,"msg":"请求过于频繁，请稍后再试"}'
-    
+          response-body: '{"code":429,"msg":"请求过于频繁，请稍后再试","data":null}'
+
     # Gateway配置
     gateway:
-      # 路由配置（从Nacos配置中心加载）
+      # 路由配置
       routes:
-        # 认证服务
+        # 认证服务 - /auth/** -> auth服务
         - id: ruoyi-nocode-auth
           uri: lb://ruoyi-nocode-auth
           predicates:
@@ -30,8 +48,13 @@ spring:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
                 key-resolver: "#{@ipKeyResolver}"
-        
-        # 系统服务
+            - name: CircuitBreaker
+              args:
+                name: authCircuitBreaker
+                statusCodes: 500,502,503,504
+                fallbackUri: forward:/fallback/auth
+
+        # 系统服务 - /system/** -> system服务
         - id: ruoyi-nocode-system
           uri: lb://ruoyi-nocode-system
           predicates:
@@ -43,7 +66,33 @@ spring:
                 redis-rate-limiter.replenishRate: 20
                 redis-rate-limiter.burstCapacity: 40
                 key-resolver: "#{@ipKeyResolver}"
-      
+            - name: CircuitBreaker
+              args:
+                name: systemCircuitBreaker
+                statusCodes: 500,502,503,504
+                fallbackUri: forward:/fallback/system
+
+        # 代码生成服务
+        - id: ruoyi-nocode-gen
+          uri: lb://ruoyi-nocode-gen
+          predicates:
+            - Path=/gen/**
+          filters:
+            - StripPrefix=1
+
+      # 默认过滤器
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT
+            methods: GET,POST
+            backoff:
+              firstBackoff: 100ms
+              maxBackoff: 500ms
+              factor: 2
+
       # 全局跨域配置
       globalcors:
         cors-configurations:
@@ -53,19 +102,6 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
-      
-      # 默认过滤器
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-        - name: Retry
-          args:
-            retries: 3
-            statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE
-            methods: GET
-            backoff:
-              firstBackoff: 100ms
-              maxBackoff: 500ms
-              factor: 2
 
   # Redis配置
   data:
@@ -81,6 +117,41 @@ spring:
           max-idle: 8
           min-idle: 0
 
+  # Resilience4j 熔断器配置
+  resilience4j:
+    circuitbreaker:
+      configs:
+        default:
+          registerHealthIndicator: true
+          slidingWindowSize: 10
+          minimumNumberOfCalls: 5
+          permittedNumberOfCallsInHalfOpenState: 3
+          automaticTransitionFromOpenToHalfOpenEnabled: true
+          waitDurationInOpenState: 10s
+          failureRateThreshold: 50
+          eventConsumerBufferSize: 10
+      instances:
+        authService:
+          baseConfig: default
+          slidingWindowSize: 10
+          failureRateThreshold: 50
+          waitDurationInOpenState: 30s
+        systemService:
+          baseConfig: default
+          slidingWindowSize: 20
+          failureRateThreshold: 40
+          waitDurationInOpenState: 30s
+    timelimiter:
+      configs:
+        default:
+          timeoutDuration: 5s
+          cancelRunningFuture: true
+      instances:
+        authService:
+          baseConfig: default
+        systemService:
+          baseConfig: default
+
 # Sa-Token配置
 sa-token:
   token-name: Authorization
@@ -90,12 +161,56 @@ sa-token:
   token-style: uuid
   is-log: false
 
+# JWT 安全配置
+jwt:
+  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026-very-long-secret-key-for-security}
+  issuer: ${JWT_ISSUER:ruoyi-nocode}
+  subject: ${JWT_SUBJECT:auth}
+  ttl-millis: ${JWT_TTL:7200000}
+  refresh-tokens: ${JWT_REFRESH_TTL:604800000}
+
+# 网关安全配置
+gateway:
+  security:
+    ip-whitelist:
+      enabled: ${IP_WHITELIST_ENABLED:false}
+      addresses:
+        - ${IP_WHITELIST:127.0.0.1,192.168.0.0/16,10.0.0.0/8}
+      excluded-paths:
+        - /auth/login
+        - /auth/register
+        - /auth/captcha
+        - /actuator/health
+        - /swagger-ui
+        - /v3/api-docs
+    cors:
+      enabled: ${CORS_ENABLED:true}
+      allowed-origin-patterns: ${CORS_ORIGINS:*}
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
+      exposed-headers: Authorization,Content-Disposition,X-Request-Id,X-Total-Count
+    rate-limit:
+      enabled: ${RATE_LIMIT_ENABLED:true}
+      global:
+        requests-per-second: ${RATE_LIMIT_RPS:100}
+        burst-capacity: ${RATE_LIMIT_BURST:200}
+      ip:
+        enabled: true
+        requests-per-second: 10
+        burst-capacity: 20
+      user:
+        enabled: true
+        requests-per-second: 50
+        burst-capacity: 100
+
 # Actuator 健康检查配置
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        include: health,info,gateway,metrics,prometheus
       base-path: /actuator
   endpoint:
     health:
@@ -107,6 +222,27 @@ management:
       enabled: true
     nacos:
       enabled: true
+    circuitBreakers:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Micrometer 指标配置
+micrometer:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    enabled: false
 
 # 日志配置
 logging:
@@ -114,3 +250,4 @@ logging:
     com.ruoyi.nocode: debug
     org.springframework.cloud.gateway: info
     org.springframework.cloud.loadbalancer: debug
+    io.github.resilience4j: debug

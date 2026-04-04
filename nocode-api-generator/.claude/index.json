@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-03-24T00:00:00.000Z",
+  "project": "nocode-api-generator",
+  "version": "1.0.0",
+  "scanStrategy": "A(轻量扫描) + B(定点读取) + C(按需补捞)",
+  "coverage": {
+    "totalFiles": 54,
+    "scannedFiles": 54,
+    "percentage": 100,
+    "byLanguage": {
+      "java": 54
+    },
+    "byModule": {
+      "nocode-api-core": {
+        "total": 33,
+        "scanned": 33,
+        "coverage": 100,
+        "interfaces": ["ApiRouter", "DatasourceRegistry", "SqlExecutor", "QueryBuilder", "MetadataCache", "ConversionOrchestrator", "SkillRegistry"],
+        "tests": null,
+        "gaps": ["缺少单元测试"]
+      },
+      "nocode-api-starter": {
+        "total": 2,
+        "scanned": 2,
+        "coverage": 100,
+        "interfaces": ["EnableNocodeApi", "NocodeApiConfiguration"],
+        "tests": null,
+        "gaps": ["缺少单元测试"]
+      },
+      "nocode-api-admin": {
+        "total": 13,
+        "scanned": 13,
+        "coverage": 100,
+        "interfaces": ["AdminController", "ApiTestController", "DatasourceConfigService", "DiagramLayoutService"],
+        "tests": null,
+        "gaps": ["缺少单元测试", "前端 node_modules 未扫描（已忽略）"]
+      },
+      "example": {
+        "total": 1,
+        "scanned": 1,
+        "coverage": 100,
+        "interfaces": ["ExampleApplication"],
+        "tests": null,
+        "gaps": ["缺少示例代码"]
+      }
+    }
+  },
+  "ignored": {
+    "topDirectories": [
+      "node_modules/**",
+      "target/**",
+      "dist/**",
+      "*.class",
+      "*.log"
+    ],
+    "reason": "第三方依赖、构建产物、日志文件"
+  },
+  "modules": [
+    {
+      "name": "nocode-api-core",
+      "path": "nocode-api-core",
+      "language": "java",
+      "entry": "com.nocode.core.router.ApiRouter",
+      "tests": null,
+      "configFiles": ["pom.xml"]
+    },
+    {
+      "name": "nocode-api-starter",
+      "path": "nocode-api-starter",
+      "language": "java",
+      "entry": "com.nocode.starter.EnableNocodeApi",
+      "tests": null,
+      "configFiles": ["pom.xml"]
+    },
+    {
+      "name": "nocode-api-admin",
+      "path": "nocode-api-admin",
+      "language": "java + vue",
+      "entry": "com.nocode.admin.NocodeApiAdminApplication",
+      "tests": null,
+      "configFiles": ["pom.xml", "application.yml", "package.json", "vite.config.js"]
+    },
+    {
+      "name": "example",
+      "path": "example",
+      "language": "java",
+      "entry": "com.nocode.example.ExampleApplication",
+      "tests": null,
+      "configFiles": ["pom.xml"]
+    }
+  ],
+  "truncated": false,
+  "nextSteps": [
+    "建议补充单元测试：SqlExecutorTest, ConversionOrchestratorTest, ApiRouterTest",
+    "建议完善前端组件测试",
+    "建议添加 integration test"
+  ],
+  "documentation": {
+    "rootCLAUDE": "CLAUDE.md",
+    "moduleCLAUDE": {
+      "nocode-api-core": "nocode-api-core/CLAUDE.md",
+      "nocode-api-starter": "nocode-api-starter/CLAUDE.md",
+      "nocode-api-admin": "nocode-api-admin/CLAUDE.md",
+      "example": "example/CLAUDE.md"
+    }
+  }
+}

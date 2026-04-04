@@ -1,8 +1,11 @@
 package com.ruoyi.nocode.common.core.compiler;
 
+import org.noear.liquor.DynamicCompiler;
+import org.noear.liquor.DynamicClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +93,7 @@ public class LiquorHotSwapService {
      * @return 热替换结果
      */
     public HotSwapResult hotSwap(String domain, String sourceCode, ClassLoader parentClassLoader) {
-        if (domain == null || domain.isBlank()) {
-            domain = "default";
-        }
+        final String effectiveDomain = (domain == null || domain.isBlank()) ? "default" : domain;
         if (sourceCode == null || sourceCode.isBlank()) {
             return HotSwapResult.failure("Source code cannot be null or empty", null);
         }
@@ -106,12 +107,12 @@ public class LiquorHotSwapService {
             );
         }
 
-        log.info("Hot swapping class '{}' in domain '{}'", className, domain);
+        log.info("Hot swapping class '{}' in domain '{}'", className, effectiveDomain);
 
         try {
             // 获取或创建域
-            HotSwapDomain hotSwapDomain = domainRegistry.computeIfAbsent(domain,
-                    k -> new HotSwapDomain(domain, parentClassLoader));
+            HotSwapDomain hotSwapDomain = domainRegistry.computeIfAbsent(effectiveDomain,
+                    k -> new HotSwapDomain(effectiveDomain, parentClassLoader));
 
             // 执行热替换
             HotSwapInfo swapInfo = hotSwapDomain.doHotSwap(sourceCode, className);
@@ -324,7 +325,7 @@ public class LiquorHotSwapService {
             }
         }
 
-        synchronized HotSwapResult doHotSwap(String sourceCode, String className) {
+        synchronized HotSwapInfo doHotSwap(String sourceCode, String className) {
             // 每次热替换都创建新的ClassLoader
             // 这样可以确保旧版本的类定义仍然被旧实例使用
             this.currentClassLoader = createNewClassLoader();
@@ -332,8 +333,22 @@ public class LiquorHotSwapService {
 
             try {
                 // 使用新的ClassLoader编译
-                Liquor liquor = Liquor.newInstance(currentClassLoader);
-                Class<?> newClass = liquor.compile(sourceCode);
+                DynamicCompiler compiler = new DynamicCompiler(currentClassLoader);
+                compiler.addSource(className, sourceCode);
+                compiler.compile();
+
+                List<String> errors = compiler.getErrors();
+                if (!errors.isEmpty()) {
+                    throw new RuntimeException("Compilation failed: " + errors);
+                }
+
+                DynamicClassLoader classLoader = compiler.getClassLoader();
+                Class<?> newClass;
+                try {
+                    newClass = classLoader.loadClass(className);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Failed to load compiled class: " + className, e);
+                }
 
                 // 记录版本历史
                 HotSwapInfo info = new HotSwapInfo(newClass, currentVersion, className);
@@ -344,7 +359,7 @@ public class LiquorHotSwapService {
 
                 return info;
 
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // 版本创建失败，回滚版本号
                 versionCounter.decrementAndGet();
                 throw e;

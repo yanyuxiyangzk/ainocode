@@ -63,6 +63,11 @@ public interface ISysRoleService extends IService<SysRole> {
     int updateRoleStatus(Long roleId, String status);
 
     /**
+     * 修改数据范围
+     */
+    int updateDataScope(Long roleId, String dataScope, Long[] deptIds);
+
+    /**
      * 给角色分配菜单
      */
     int insertRoleMenu(Long roleId, Long[] menuIds);

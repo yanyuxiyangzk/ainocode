@@ -83,46 +83,56 @@ public class SandboxService {
      */
     public SandboxResult execute(SandboxTask task, long timeoutMs) {
         long startTime = System.currentTimeMillis();
-        
+
         // 保存原始安全管理器
         SecurityManager originalSecurityManager = System.getSecurityManager();
-        
+
+        // 创建带超时限制的任务
+        Future<SandboxResult> future = executorService.submit(() -> {
+            return task.run();
+        });
+
         try {
             // 设置沙箱安全管理器
             System.setSecurityManager(new SandboxSecurityManager());
-            
-            // 创建带超时限制的任务
-            Future<SandboxResult> future = executorService.submit(() -> {
-                return task.run();
-            });
 
             // 等待执行结果
             SandboxResult result = future.get(timeoutMs, TimeUnit.MILLISECONDS);
-            
+
             long executionTime = System.currentTimeMillis() - startTime;
             return SandboxResult.success(result.getReturnValue(), result.getOutput(), executionTime);
 
         } catch (TimeoutException e) {
             log.warn("Sandbox execution timeout: {}ms", timeoutMs);
             future.cancel(true);
-            return SandboxResult.failure("Execution timeout after " + timeoutMs + "ms", SandboxError.TIMEOUT);
+            SandboxResult result = SandboxResult.failure("Execution timeout after " + timeoutMs + "ms");
+            result.setErrorCode(SandboxError.TIMEOUT);
+            return result;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.warn("Sandbox execution interrupted");
-            return SandboxResult.failure("Execution interrupted", SandboxError.INTERRUPTED);
+            SandboxResult result = SandboxResult.failure("Execution interrupted");
+            result.setErrorCode(SandboxError.INTERRUPTED);
+            return result;
 
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
             log.error("Sandbox execution error", cause);
             if (cause instanceof SandboxException) {
-                return SandboxResult.failure(cause.getMessage(), ((SandboxException) cause).getErrorCode());
+                SandboxResult result = SandboxResult.failure(cause.getMessage());
+                result.setErrorCode(((SandboxException) cause).getError());
+                return result;
             }
-            return SandboxResult.failure("Execution error: " + cause.getMessage(), SandboxError.EXECUTION_ERROR);
+            SandboxResult result = SandboxResult.failure("Execution error: " + cause.getMessage());
+            result.setErrorCode(SandboxError.EXECUTION_ERROR);
+            return result;
 
         } catch (SecurityException e) {
             log.warn("Sandbox security violation: {}", e.getMessage());
-            return SandboxResult.failure("Security violation: " + e.getMessage(), SandboxError.SECURITY_ERROR);
+            SandboxResult result = SandboxResult.failure("Security violation: " + e.getMessage());
+            result.setErrorCode(SandboxError.SECURITY_ERROR);
+            return result;
 
         } finally {
             // 恢复原始安全管理器

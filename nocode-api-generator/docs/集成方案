@@ -1,0 +1,273 @@
+完整集成步骤
+
+  第一步：发布 nocode-api-admin 到本地仓库
+
+   cd
+   D:\project\java\aicoding\item\nocodeclaude3\nocode-api-g
+   enerator
+   mvn clean install -DskipTests
+
+  ---
+
+  第二步：RuoYi 父 POM 添加版本管理
+
+  在 ruoyi-cloud/pom.xml 中添加：
+
+   <properties>
+       <!-- 原有配置 -->
+       <nocode.version>1.0.0</nocode.version>
+   </properties>
+
+   <dependencyManagement>
+       <dependencies>
+           <!-- 原有依赖 -->
+
+           <!-- NoCode API -->
+           <dependency>
+               <groupId>com.nocode</groupId>
+               <artifactId>nocode-api-admin</artifactId>
+               <version>${nocode.version}</version>
+           </dependency>
+       </dependencies>
+   </dependencyManagement>
+
+  ---
+
+  第三步：创建 ruoyi-nocode 模块
+
+  在 ruoyi-modules 下创建目录结构：
+
+   ruoyi-modules/ruoyi-nocode/
+   ├── pom.xml
+   └── src/main/
+       ├── java/org/ruoyi/nocode/
+       │   └── RuoYiNocodeApplication.java
+       └── resources/
+           └── bootstrap.yml
+
+  ---
+
+  第四步：创建 pom.xml
+
+  文件：ruoyi-modules/ruoyi-nocode/pom.xml
+
+   <?xml version="1.0" encoding="UTF-8"?>
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+   http://maven.apache.org/xsd/maven-4.0.0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+
+       <parent>
+           <groupId>org.ruoyi</groupId>
+           <artifactId>ruoyi-modules</artifactId>
+           <version>${ruoyi.version}</version>
+       </parent>
+
+       <artifactId>ruoyi-nocode</artifactId>
+       <description>NoCode API 动态接口服务</description>
+
+       <dependencies>
+           <!-- NoCode API -->
+           <dependency>
+               <groupId>com.nocode</groupId>
+               <artifactId>nocode-api-admin</artifactId>
+           </dependency>
+
+           <!-- Nacos 服务发现 -->
+           <dependency>
+               <groupId>com.alibaba.cloud</groupId>
+               <artifactId>
+   spring-cloud-starter-alibaba-nacos-discovery</artifactId
+   >
+           </dependency>
+
+           <!-- Nacos 配置中心 -->
+           <dependency>
+               <groupId>com.alibaba.cloud</groupId>
+               <artifactId>
+   spring-cloud-starter-alibaba-nacos-config</artifactId>
+           </dependency>
+       </dependencies>
+
+       <build>
+           <plugins>
+               <plugin>
+                   <groupId>org.springframework.boot</
+   groupId>
+                   <artifactId>spring-boot-maven-plugin</
+   artifactId>
+               </plugin>
+           </plugins>
+       </build>
+   </project>
+
+  ---
+
+  第五步：创建启动类
+
+  文件：ruoyi-modules/ruoyi-nocode/src/main/java/org/ruoyi/nocod
+  e/RuoYiNocodeApplication.java
+
+   package org.ruoyi.nocode;
+
+   import com.nocode.starter.EnableNocodeApi;
+   import org.springframework.boot.SpringApplication;
+   import
+   org.springframework.boot.autoconfigure.SpringBootApplica
+   tion;
+   import
+   org.springframework.cloud.client.discovery.EnableDiscove
+   ryClient;
+
+   /**
+    * NoCode API 服务启动类
+    */
+   @SpringBootApplication
+   @EnableDiscoveryClient
+   @EnableNocodeApi(enableAdmin = true)
+   public class RuoYiNocodeApplication {
+       public static void main(String[] args) {
+
+   SpringApplication.run(RuoYiNocodeApplication.class,
+   args);
+       }
+   }
+
+  ---
+
+  第六步：创建 bootstrap.yml
+
+  文件：ruoyi-modules/ruoyi-nocode/src/main/resources/bootstrap.
+  yml
+
+   spring:
+     application:
+       name: ruoyi-nocode
+     profiles:
+       active: dev
+     cloud:
+       nacos:
+         discovery:
+           server-addr: localhost:8848
+         config:
+           server-addr: localhost:8848
+           file-extension: yml
+           shared-configs:
+             -
+   application-${spring.profiles.active}.${spring.cloud.nac
+   os.config.file-extension}
+           extension-configs:
+             - data-id: ruoyi-nocode.yml
+               group: DEFAULT_GROUP
+               refresh: true
+
+  ---
+
+  第七步：父模块添加子模块
+
+  文件：ruoyi-modules/pom.xml
+
+   <modules>
+       <module>ruoyi-system</module>
+       <module>ruoyi-gen</module>
+       <module>ruoyi-job</module>
+       <module>ruoyi-file</module>
+       <module>ruoyi-nocode</module>  <!-- 新增 -->
+   </modules>
+
+  ---
+
+  第八步：Nacos 配置中心添加配置
+
+  Data ID: ruoyi-nocode.yml
+  Group: DEFAULT_GROUP
+
+   server:
+     port: 9205
+     servlet:
+       context-path: /nocode-admin
+
+   spring:
+     jpa:
+       hibernate:
+         ddl-auto: update
+       show-sql: false
+       properties:
+         hibernate:
+           dialect: org.hibernate.dialect.PostgreSQLDialect
+
+   nocode:
+     api:
+       enabled: true
+       admin:
+         enabled: true
+         path: /nocode-admin
+       datasources:
+         - name: business
+           jdbc-url: jdbc:postgresql://127.0.0.1:15432/cost
+           username: ods
+           password: Test@123
+           driver-class-name: org.postgresql.Driver
+           initialSize: 5
+           minIdle: 5
+           maxActive: 20
+       defaultPageSize: 10
+       maxPageSize: 1000
+       corsEnabled: true
+
+  ---
+
+  第九步：网关路由配置（可选）
+
+  如需通过网关访问，在 ruoyi-gateway.yml 添加路由：
+
+   spring:
+     cloud:
+       gateway:
+         routes:
+           # 原有路由...
+
+           # NoCode API 路由
+           - id: ruoyi-nocode
+             uri: lb://ruoyi-nocode
+             predicates:
+               - Path=/nocode-admin/**
+             filters:
+               - StripPrefix=0
+
+  ---
+
+  第十步：启动测试
+
+   # 1. 启动 Nacos
+   # 2. 启动 RuoYi-Gateway
+   # 3. 启动 ruoyi-nocode 服务
+
+   # 访问管理界面
+   http://localhost:9205/nocode-admin/index.html
+
+   # 或通过网关访问
+   http://localhost:8080/nocode-admin/index.html
+
+  ---
+
+  集成完成清单
+
+✦
+  ┌──────┬───────────────────────────────────┬──────┐
+  │ 步骤 │ 操作                              │ 状态 │
+  ├──────┼───────────────────────────────────┼──────┤
+  │ 1    │ mvn install 发布 nocode-api-admin │ ☐    │
+  │ 2    │ 父 POM 添加版本管理               │ ☐    │
+  │ 3    │ 创建 ruoyi-nocode 目录            │ ☐    │
+  │ 4    │ 创建 pom.xml                      │ ☐    │
+  │ 5    │ 创建启动类                        │ ☐    │
+  │ 6    │ 创建 bootstrap.yml                │ ☐    │
+  │ 7    │ 父模块添加子模块                  │ ☐    │
+  │ 8    │ Nacos 添加配置                    │ ☐    │
+  │ 9    │ 网关路由配置（可选）              │ ☐    │
+  │ 10   │ 启动测试                          │ ☐    │
+  └──────┴───────────────────────────────────┴──────┘

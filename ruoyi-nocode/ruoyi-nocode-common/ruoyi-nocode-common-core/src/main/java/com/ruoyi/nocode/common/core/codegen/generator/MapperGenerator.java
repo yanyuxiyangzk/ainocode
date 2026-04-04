@@ -163,11 +163,4 @@ public class MapperGenerator extends BaseCodeGenerator {
     protected String getModulePackage() {
         return "mapper";
     }
-
-    private String lowerFirst(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return Character.toLowerCase(str.charAt(0)) + str.substring(1);
-    }
 }

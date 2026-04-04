@@ -1,0 +1,20 @@
+{
+  "skills": {
+    "auto-dev": {
+      "description": "24小时自动化开发系统 - 启动自主运行的AI开发团队",
+      "trigger": [
+        "开始自动化开发",
+        "启动auto-dev",
+        "运行自动开发",
+        "自动开发",
+        "启动开发机器人",
+        "start auto-dev",
+        "run auto-dev"
+      ],
+      "skillFile": ".claude/skills/auto-dev.md"
+    }
+  },
+  "permissions": {
+    "allowDangerousTools": true
+  }
+}

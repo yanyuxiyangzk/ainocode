@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nocode.admin.entity.DiagramLayoutEntity;
 import com.nocode.admin.repository.DiagramLayoutRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +16,10 @@ import java.util.Optional;
 /**
  * ER图布局服务
  */
-@Slf4j
 @Service
 public class DiagramLayoutService {
-    
+    private static final Logger log = LoggerFactory.getLogger(DiagramLayoutService.class);
+
     private final DiagramLayoutRepository repository;
     private final ObjectMapper objectMapper;
     

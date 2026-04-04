@@ -1,0 +1,158 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索栏 -->
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
+#foreach ($column in $table.queryColumns)
+#if ($column.javaType == "String")
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-input
+          v-model="queryParams.${column.fieldName}"
+          placeholder="请输入${column.columnComment}"
+          clearable
+          @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+#elseif ($column.dictField)
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-select v-model="queryParams.${column.fieldName}" placeholder="请选择${column.columnComment}" clearable>
+          <el-option label="全部" value="" />
+          <el-option
+            v-for="dict in dictData"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
+#end
+#end
+      <el-form-item>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <!-- 操作按钮 -->
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="Plus"
+          @click="handleAdd"
+        >新增</el-button>
+      </el-col>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <!-- 表格 -->
+    <el-table v-loading="loading" :data="${table.variableName}List">
+      <el-table-column label="${table.tableComment}" align="center" prop="${table.pkField}" />
+#foreach ($column in $table.columns)
+#if (!$column.primaryKey && $column.columnComment && $column.columnComment != '')
+#if ($column.dictField)
+      <el-table-column label="${column.columnComment}" align="center" prop="${column.fieldName}" />
+#elseif ($column.javaType == "LocalDateTime")
+      <el-table-column label="${column.columnComment}" align="center" prop="${column.fieldName}" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.${column.fieldName}) }}</span>
+        </template>
+      </el-table-column>
+#else
+      <el-table-column label="${column.columnComment}" align="center" prop="${column.fieldName}" />
+#end
+#end
+#end
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleUpdate(scope.row)"
+          >修改</el-button>
+          <el-button
+            link
+            type="danger"
+            icon="Delete"
+            @click="handleDelete(scope.row)"
+          >删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <pagination
+      v-model:total="total"
+      v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+  </div>
+</template>
+
+<script setup name="${table.entityName}">
+import { list${table.entityName}, del${table.entityName} } from '@/api/${table.moduleName}/${table.variableName}'
+
+const { proxy } = getCurrentInstance()
+
+const ${table.variableName}List = ref([])
+const loading = ref(true)
+const showSearch = ref(true)
+const total = ref(0)
+
+const queryParams = ref({
+  pageNum: 1,
+  pageSize: 10
+})
+
+/** 查询列表 */
+function getList() {
+  loading.value = true
+  list${table.entityName}(queryParams.value).then(response => {
+    ${table.variableName}List.value = response.rows
+    total.value = response.total
+    loading.value = false
+  })
+}
+
+/** 搜索按钮 */
+function handleQuery() {
+  queryParams.value.pageNum = 1
+  getList()
+}
+
+/** 重置按钮 */
+function resetQuery() {
+  proxy.resetForm('queryForm')
+  handleQuery()
+}
+
+/** 新增按钮 */
+function handleAdd() {
+  proxy.$tab.closePage()
+  proxy.$router.push({
+    path: '/${table.moduleName}/${table.variableName}/add',
+    query: {}
+  })
+}
+
+/** 修改按钮 */
+function handleUpdate(row) {
+  proxy.$tab.closePage()
+  proxy.$router.push({
+    path: '/${table.moduleName}/${table.variableName}/edit',
+    query: { id: row.${table.pkField} }
+  })
+}
+
+/** 删除按钮 */
+function handleDelete(row) {
+  proxy.$modal.confirm('是否确认删除?')
+    .then(() => del${table.entityName}(row.${table.pkField}))
+    .then(() => getList())
+    .catch(() => {})
+}
+
+getList()
+</script>

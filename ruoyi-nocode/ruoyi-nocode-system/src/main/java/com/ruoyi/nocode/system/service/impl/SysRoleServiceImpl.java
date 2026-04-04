@@ -110,6 +110,17 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public int updateDataScope(Long roleId, String dataScope, Long[] deptIds) {
+        SysRole role = new SysRole();
+        role.setRoleId(roleId);
+        role.setDataScope(dataScope);
+        int rows = roleMapper.updateById(role);
+        // TODO: 处理部门数据范围关联
+        return rows;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public int insertRoleMenu(Long roleId, Long[] menuIds) {
         SysRoleMenu roleMenu = new SysRoleMenu();
         for (Long menuId : menuIds) {

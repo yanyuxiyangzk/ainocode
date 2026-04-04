@@ -1,0 +1,86 @@
+# RuoyiNoCode Auth Nacos 配置
+
+server:
+  port: 9200
+
+spring:
+  application:
+    name: ruoyi-nocode-auth
+
+  # PostgreSQL 数据库配置
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:15432}/${DB_NAME:cost}
+    username: ${DB_USER:ods}
+    password: ${DB_PASSWORD:Test@123}
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+
+  # Redis 配置
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.ruoyi.nocode.**.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: delFlag
+      logic-delete-value: 2
+      logic-not-delete-value: 0
+
+# Sa-Token 配置
+sa-token:
+  token-name: Authorization
+  timeout: 7200
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026}
+  issuer: ${JWT_ISSUER:ruoyi-nocode}
+  subject: ${JWT_SUBJECT:auth}
+  ttlMillis: ${JWT_TTL:7200000}
+
+# Swagger 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# Actuator 健康检查配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+    redis:
+      enabled: true
+    nacos:
+      enabled: true
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi.nocode: debug

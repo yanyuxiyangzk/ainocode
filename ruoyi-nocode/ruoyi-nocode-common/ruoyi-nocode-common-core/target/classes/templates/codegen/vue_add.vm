@@ -1,0 +1,84 @@
+<template>
+  <div class="app-container">
+    <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+#foreach ($column in $table.validateColumns)
+#if (!$column.primaryKey)
+#if ($column.javaType == "String")
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-input v-model="form.${column.fieldName}" placeholder="请输入${column.columnComment}" />
+      </el-form-item>
+#elseif ($column.javaType == "Integer" || $column.javaType == "Long")
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-input-number v-model="form.${column.fieldName}" controls-position="right" placeholder="请输入${column.columnComment}" />
+      </el-form-item>
+#elseif ($column.javaType == "LocalDateTime")
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-date-picker
+          v-model="form.${column.fieldName}"
+          type="datetime"
+          placeholder="选择${column.columnComment}"
+        />
+      </el-form-item>
+#elseif ($column.dictField)
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-select v-model="form.${column.fieldName}" placeholder="请选择${column.columnComment}">
+          <el-option label="请选择" value="" />
+        </el-select>
+      </el-form-item>
+#else
+      <el-form-item label="${column.columnComment}" prop="${column.fieldName}">
+        <el-input v-model="form.${column.fieldName}" placeholder="请输入${column.columnComment}" />
+      </el-form-item>
+#end
+#end
+#end
+    </el-form>
+    <div class="footer">
+      <el-button type="primary" @click="submitForm">确 定</el-button>
+      <el-button @click="cancel">取 消</el-button>
+    </div>
+  </div>
+</template>
+
+<script setup name="${table.entityName}Add">
+import { add${table.entityName} } from '@/api/${table.moduleName}/${table.variableName}'
+
+const { proxy } = getCurrentInstance()
+
+const form = ref({})
+const rules = ref({
+#foreach ($column in $table.validateColumns)
+#if (!$column.primaryKey)
+#if ($column.javaType == "String")
+  ${column.fieldName}: [{ required: true, message: '${column.columnComment}不能为空', trigger: 'blur' }],
+#elseif ($column.dictField)
+  ${column.fieldName}: [{ required: true, message: '请选择${column.columnComment}', trigger: 'change' }],
+#end
+#end
+#end
+})
+
+/** 提交按钮 */
+function submitForm() {
+  proxy.$refs.form.validate(valid => {
+    if (valid) {
+      add${table.entityName}(form.value).then(response => {
+        proxy.$modal.msgSuccess('新增成功')
+        proxy.$tab.closePage()
+      })
+    }
+  })
+}
+
+/** 取消按钮 */
+function cancel() {
+  proxy.$tab.closePage()
+}
+</script>
+
+<style scoped>
+.footer {
+  text-align: center;
+  margin-top: 20px;
+}
+</style>

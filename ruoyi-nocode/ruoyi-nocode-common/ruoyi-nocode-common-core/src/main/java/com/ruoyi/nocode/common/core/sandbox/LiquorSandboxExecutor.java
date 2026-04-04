@@ -16,6 +16,7 @@ import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
@@ -154,15 +155,19 @@ public class LiquorSandboxExecutor {
         }
 
         // 包装代码，捕获输出
-        String wrappedCode = wrapCode(code);
+        final String wrappedCodeFinal = wrapCode(code);
+        final ScriptEngine engineFinal = engine;
 
         try {
             // 使用ExecutorService实现超时控制
-            return executeWithTimeout(() -> {
-                try {
-                    return engine.eval(wrappedCode);
-                } catch (ScriptException e) {
-                    throw new SandboxExecutionException(e.getMessage());
+            return executeWithTimeout(new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    try {
+                        return engineFinal.eval(wrappedCodeFinal);
+                    } catch (ScriptException e) {
+                        throw new SandboxExecutionException(e.getMessage());
+                    }
                 }
             }, timeoutMs);
 
@@ -171,6 +176,8 @@ public class LiquorSandboxExecutor {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new SandboxExecutionException("Execution interrupted");
+        } catch (ExecutionException e) {
+            throw new SandboxExecutionException("Execution error: " + e.getMessage());
         }
     }
 
@@ -189,10 +196,12 @@ public class LiquorSandboxExecutor {
 
     /**
      * 创建沙箱安全管理器
+     * @deprecated JDK17中SecurityManager已废弃，该方法仅用于保持API兼容
      */
+    @Deprecated
     private SecurityManager createSandboxSecurityManager() {
-        SecurityManager sm = new SecurityManager(new SandboxPolicy());
-        return sm;
+        // JDK17移除了SecurityManager的Policy构造函数，使用默认构造函数
+        return new SecurityManager();
     }
 
     /**
@@ -219,71 +228,14 @@ public class LiquorSandboxExecutor {
      * @param className    类名
      * @param timeoutMs    超时时间
      * @return 执行结果
+     * @deprecated JDK17移除了SecurityManager的Policy构造函数，且ToolProvider需要访问内部模块，
+     *             该方法已废弃。请使用{@link LiquorCompilerService}进行Java编译，
+     *             使用{@link #execute(String)}执行JavaScript代码。
      */
+    @Deprecated
     public SandboxResult executeJava(String code, String className, long timeoutMs) {
-        long startTime = System.currentTimeMillis();
-        List<String> errors = new ArrayList<>();
-
-        // 设置安全管理器
-        SecurityManager oldSecurityManager = System.getSecurityManager();
-        SecurityManager sandboxSecurityManager = createSandboxSecurityManager();
-        System.setSecurityManager(sandboxSecurityManager);
-
-        try {
-            // 获取编译器
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            if (compiler == null) {
-                return SandboxResult.failure("Java compiler not available - running in limited environment");
-            }
-
-            // 写入临时文件
-            File tempDir = new File(System.getProperty("java.io.tmpdir"), "sandbox");
-            if (!tempDir.exists()) {
-                tempDir.mkdirs();
-            }
-            File sourceFile = new File(tempDir, className + ".java");
-
-            // 使用文件输出流写入
-            try (FileOutputStream fos = new FileOutputStream(sourceFile)) {
-                fos.write(code.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            }
-
-            // 编译
-            int result = compiler.run(null, null, null, sourceFile.getPath());
-            if (result != 0) {
-                return SandboxResult.failure("Compilation failed with exit code: " + result);
-            }
-
-            // 加载并执行
-            URL[] urls = new URL[]{tempDir.toURI().toURL()};
-            URLClassLoader classLoader = new URLClassLoader(urls);
-            Class<?> clazz = classLoader.loadClass(className);
-            Method mainMethod = clazz.getMethod("main", String[].class);
-
-            // 执行（带超时）
-            Object ret = executeWithTimeout(() -> {
-                try {
-                    mainMethod.invoke(null, (Object) new String[]{});
-                    return null;
-                } catch (Exception e) {
-                    throw new SandboxExecutionException(e.getMessage());
-                }
-            }, timeoutMs);
-
-            return SandboxResult.success(ret, System.currentTimeMillis() - startTime);
-
-        } catch (SandboxTimeoutException e) {
-            return SandboxResult.timeout(System.currentTimeMillis() - startTime);
-
-        } catch (SandboxSecurityException e) {
-            return SandboxResult.securityFailure(List.of("Security violation: " + e.getMessage()));
-
-        } catch (Exception e) {
-            return SandboxResult.failure(e.getMessage());
-
-        } finally {
-            System.setSecurityManager(oldSecurityManager);
-        }
+        return SandboxResult.failure("Java compilation execution is not supported in JDK 17+. " +
+                "Use LiquorCompilerService for Java compilation and execute() for JavaScript execution.");
     }
 
     /**

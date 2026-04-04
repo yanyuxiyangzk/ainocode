@@ -1,6 +1,5 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
  * @author auto-dev
  * @since 2026-04-03
  */
-@Data
 @Entity
 @Table(name = "nocode_workflow_node")
 public class WorkflowNodeEntity {
@@ -88,4 +86,40 @@ public class WorkflowNodeEntity {
     protected void onCreate() {
         createTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getDefinitionId() { return definitionId; }
+    public void setDefinitionId(Long definitionId) { this.definitionId = definitionId; }
+    public String getNodeKey() { return nodeKey; }
+    public void setNodeKey(String nodeKey) { this.nodeKey = nodeKey; }
+    public String getNodeName() { return nodeName; }
+    public void setNodeName(String nodeName) { this.nodeName = nodeName; }
+    public String getNodeType() { return nodeType; }
+    public void setNodeType(String nodeType) { this.nodeType = nodeType; }
+    public String getAssigneeType() { return assigneeType; }
+    public void setAssigneeType(String assigneeType) { this.assigneeType = assigneeType; }
+    public String getAssignee() { return assignee; }
+    public void setAssignee(String assignee) { this.assignee = assignee; }
+    public String getCandidates() { return candidates; }
+    public void setCandidates(String candidates) { this.candidates = candidates; }
+    public Long getRoleId() { return roleId; }
+    public void setRoleId(Long roleId) { this.roleId = roleId; }
+    public String getCounterSignConfig() { return counterSignConfig; }
+    public void setCounterSignConfig(String counterSignConfig) { this.counterSignConfig = counterSignConfig; }
+    public Boolean getIsCounterSign() { return isCounterSign; }
+    public void setIsCounterSign(Boolean isCounterSign) { this.isCounterSign = isCounterSign; }
+    public String getNodeProps() { return nodeProps; }
+    public void setNodeProps(String nodeProps) { this.nodeProps = nodeProps; }
+    public String getNodePosition() { return nodePosition; }
+    public void setNodePosition(String nodePosition) { this.nodePosition = nodePosition; }
+    public Integer getDurationHours() { return durationHours; }
+    public void setDurationHours(Integer durationHours) { this.durationHours = durationHours; }
+    public String getOverdueAction() { return overdueAction; }
+    public void setOverdueAction(String overdueAction) { this.overdueAction = overdueAction; }
+    public Long getFormId() { return formId; }
+    public void setFormId(Long formId) { this.formId = formId; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

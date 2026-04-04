@@ -42,16 +42,16 @@ public class IsolatedClassLoaderUtil {
      * @return 隔离的类加载器
      */
     public static ClassLoader createIsolatedClassLoader(ClassLoader parentClassLoader) {
-        if (parentClassLoader == null) {
-            parentClassLoader = Thread.currentThread().getContextClassLoader();
-        }
+        final ClassLoader effectiveParent = (parentClassLoader == null)
+                ? Thread.currentThread().getContextClassLoader()
+                : parentClassLoader;
 
-        String loaderId = generateLoaderId(parentClassLoader);
+        String loaderId = generateLoaderId(effectiveParent);
 
         return classLoaderCache.computeIfAbsent(loaderId, id -> {
             log.debug("Creating new isolated class loader with parent: {}",
-                    parentClassLoader.getClass().getName());
-            return new IsolatedClassLoaderHolder(createNewClassLoader(parentClassLoader));
+                    effectiveParent.getClass().getName());
+            return new IsolatedClassLoaderHolder(createNewClassLoader(effectiveParent));
         }).getClassLoader();
     }
 

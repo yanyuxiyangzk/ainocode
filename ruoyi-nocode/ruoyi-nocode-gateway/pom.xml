@@ -95,6 +95,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Swagger -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-nocode-common-swagger</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

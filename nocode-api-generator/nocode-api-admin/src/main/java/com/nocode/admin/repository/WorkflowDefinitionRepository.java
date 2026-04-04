@@ -3,6 +3,7 @@ package com.nocode.admin.repository;
 import com.nocode.admin.entity.WorkflowDefinitionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,4 +21,9 @@ public interface WorkflowDefinitionRepository extends JpaRepository<WorkflowDefi
      * 根据流程标识和版本查询
      */
     Optional<WorkflowDefinitionEntity> findByProcessKeyAndVersion(String processKey, Integer version);
+
+    /**
+     * 根据状态查询
+     */
+    List<WorkflowDefinitionEntity> findByStatus(String status);
 }

@@ -99,6 +99,15 @@ public class SysRoleController {
     }
 
     /**
+     * 修改数据范围
+     */
+    @PreAuthorize("@ss.hasPermi('system:role:edit')")
+    @PutMapping("/dataScope")
+    public AjaxResult dataScope(@RequestBody SysRole role) {
+        return AjaxResult.success(roleService.updateDataScope(role.getRoleId(), role.getDataScope(), role.getMenuIds()));
+    }
+
+    /**
      * 获取角色选择列表
      */
     @PreAuthorize("@ss.hasPermi('system:role:list')")

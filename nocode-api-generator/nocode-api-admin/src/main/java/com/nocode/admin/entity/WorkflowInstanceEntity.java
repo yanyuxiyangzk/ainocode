@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 流程实例实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_workflow_instance")
 public class WorkflowInstanceEntity {
@@ -53,4 +51,24 @@ public class WorkflowInstanceEntity {
     protected void onCreate() {
         createTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getDefinitionId() { return definitionId; }
+    public void setDefinitionId(Long definitionId) { this.definitionId = definitionId; }
+    public String getBusinessKey() { return businessKey; }
+    public void setBusinessKey(String businessKey) { this.businessKey = businessKey; }
+    public String getApplicant() { return applicant; }
+    public void setApplicant(String applicant) { this.applicant = applicant; }
+    public String getCurrentNodeId() { return currentNodeId; }
+    public void setCurrentNodeId(String currentNodeId) { this.currentNodeId = currentNodeId; }
+    public String getCurrentNodeName() { return currentNodeName; }
+    public void setCurrentNodeName(String currentNodeName) { this.currentNodeName = currentNodeName; }
+    public String getInstanceStatus() { return instanceStatus; }
+    public void setInstanceStatus(String instanceStatus) { this.instanceStatus = instanceStatus; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 }

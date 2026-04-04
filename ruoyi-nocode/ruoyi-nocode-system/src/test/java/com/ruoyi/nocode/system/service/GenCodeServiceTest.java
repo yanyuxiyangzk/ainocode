@@ -147,7 +147,7 @@ class GenCodeServiceTest {
 
         Map<String, String> result = genCodeService.previewCode(1L);
 
-        // 验证生成了所有模板代码
+        // 验证生成了所有Java模板代码
         assertNotNull(result);
         assertTrue(result.containsKey("entity.java"));
         assertTrue(result.containsKey("mapper.java"));
@@ -159,6 +159,32 @@ class GenCodeServiceTest {
         String entityCode = result.get("entity.java");
         assertNotNull(entityCode);
         assertTrue(entityCode.contains("class"));
+    }
+
+    @Test
+    @DisplayName("预览代码包含Vue组件")
+    void testPreviewCodeIncludesVue() {
+        when(genTableMapper.selectById(1L)).thenReturn(testTable);
+        when(genTableColumnMapper.selectGenTableColumnByTableId(1L)).thenReturn(testColumns);
+
+        Map<String, String> result = genCodeService.previewCode(1L);
+
+        // 验证生成了Vue模板代码
+        assertNotNull(result);
+        assertTrue(result.containsKey("views/vue/index.vue"), "应包含Vue列表组件");
+        assertTrue(result.containsKey("api/user.js"), "应包含Vue API模块");
+
+        // 验证Vue代码内容
+        String vueIndexCode = result.get("views/vue/index.vue");
+        assertNotNull(vueIndexCode);
+        assertTrue(vueIndexCode.contains("<template>"), "Vue组件应包含template标签");
+        assertTrue(vueIndexCode.contains("<script setup"), "Vue组件应包含script标签");
+        assertTrue(vueIndexCode.contains("listSysUser") || vueIndexCode.contains("user"), "Vue组件应包含列表相关代码");
+
+        String vueApiCode = result.get("api/user.js");
+        assertNotNull(vueApiCode);
+        assertTrue(vueApiCode.contains("export function list"), "Vue API应包含list导出");
+        assertTrue(vueApiCode.contains("/system/user"), "Vue API应包含正确的请求路径");
     }
 
     @Test

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.nocode.system.mapper.SysLogininforMapper">
+
+    <resultMap type="com.ruoyi.nocode.system.entity.SysLogininfor" id="SysLogininforResult">
+        <id property="infoId" column="info_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="status" column="status"/>
+        <result property="ipaddr" column="ipaddr"/>
+        <result property="loginLocation" column="login_location"/>
+        <result property="browser" column="browser"/>
+        <result property="os" column="os"/>
+        <result property="msg" column="msg"/>
+        <result property="loginTime" column="login_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="selectLogininforVo">
+        select info_id, user_name, status, ipaddr, login_location, browser, os, msg, login_time, del_flag
+        from sys_logininfor
+        where del_flag = '0'
+    </sql>
+
+    <select id="selectLogininforById" parameterType="Long" resultMap="SysLogininforResult">
+        <include refid="selectLogininforVo"/>
+        and info_id = #{infoId}
+    </select>
+
+    <select id="selectLogininforList" resultMap="SysLogininforResult">
+        <include refid="selectLogininforVo"/>
+        <if test="logininfor != null">
+            <if test="logininfor.userName != null and logininfor.userName != ''">
+                AND user_name like concat('%', #{logininfor.userName}, '%')
+            </if>
+            <if test="logininfor.status != null and logininfor.status != ''">
+                AND status = #{logininfor.status}
+            </if>
+            <if test="logininfor.ipaddr != null and logininfor.ipaddr != ''">
+                AND ipaddr like concat('%', #{logininfor.ipaddr}, '%')
+            </if>
+        </if>
+        <if test="beginTime != null">
+            AND login_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+        order by login_time desc
+    </select>
+
+    <delete id="deleteLogininforByIds" parameterType="Long">
+        delete from sys_logininfor where info_id in
+        <foreach item="infoId" collection="array" open="(" separator="," close=")">
+            #{infoId}
+        </foreach>
+    </delete>
+
+    <update id="cleanLogininfor">
+        truncate table sys_logininfor
+    </update>
+
+</mapper>

@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 表单组件实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_form_component")
 public class FormComponentEntity {
@@ -93,4 +91,40 @@ public class FormComponentEntity {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getComponentType() { return componentType; }
+    public void setComponentType(String componentType) { this.componentType = componentType; }
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+    public String getFieldName() { return fieldName; }
+    public void setFieldName(String fieldName) { this.fieldName = fieldName; }
+    public String getPlaceholder() { return placeholder; }
+    public void setPlaceholder(String placeholder) { this.placeholder = placeholder; }
+    public String getDefaultValue() { return defaultValue; }
+    public void setDefaultValue(String defaultValue) { this.defaultValue = defaultValue; }
+    public Boolean getRequired() { return required; }
+    public void setRequired(Boolean required) { this.required = required; }
+    public String getValidationRules() { return validationRules; }
+    public void setValidationRules(String validationRules) { this.validationRules = validationRules; }
+    public String getComponentProps() { return componentProps; }
+    public void setComponentProps(String componentProps) { this.componentProps = componentProps; }
+    public Integer getSort() { return sort; }
+    public void setSort(Integer sort) { this.sort = sort; }
+    public Long getFormId() { return formId; }
+    public void setFormId(Long formId) { this.formId = formId; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public String getCreateBy() { return createBy; }
+    public void setCreateBy(String createBy) { this.createBy = createBy; }
+    public String getUpdateBy() { return updateBy; }
+    public void setUpdateBy(String updateBy) { this.updateBy = updateBy; }
+    public String getDelFlag() { return delFlag; }
+    public void setDelFlag(String delFlag) { this.delFlag = delFlag; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
 }

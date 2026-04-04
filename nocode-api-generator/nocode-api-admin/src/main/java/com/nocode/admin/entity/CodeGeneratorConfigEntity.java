@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 代码生成器配置实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_code_generator_config")
 public class CodeGeneratorConfigEntity {
@@ -70,4 +68,30 @@ public class CodeGeneratorConfigEntity {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getTableName() { return tableName; }
+    public void setTableName(String tableName) { this.tableName = tableName; }
+    public String getEntityName() { return entityName; }
+    public void setEntityName(String entityName) { this.entityName = entityName; }
+    public String getPackageName() { return packageName; }
+    public void setPackageName(String packageName) { this.packageName = packageName; }
+    public String getModuleName() { return moduleName; }
+    public void setModuleName(String moduleName) { this.moduleName = moduleName; }
+    public String getGenerateType() { return generateType; }
+    public void setGenerateType(String generateType) { this.generateType = generateType; }
+    public String getTemplateConfig() { return templateConfig; }
+    public void setTemplateConfig(String templateConfig) { this.templateConfig = templateConfig; }
+    public String getFieldConfig() { return fieldConfig; }
+    public void setFieldConfig(String fieldConfig) { this.fieldConfig = fieldConfig; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
 }

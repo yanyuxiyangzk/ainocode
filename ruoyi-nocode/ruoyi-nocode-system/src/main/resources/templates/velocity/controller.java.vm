@@ -2,6 +2,7 @@ package ${packageName}.controller;
 
 import com.ruoyi.nocode.common.core.domain.AjaxResult;
 import com.ruoyi.nocode.common.core.domain.TableDataInfo;
+import com.ruoyi.nocode.common.core.utils.poi.ExcelUtil;
 import ${packageName}.entity.${className};
 import ${packageName}.service.I${className}Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -72,5 +74,16 @@ public class ${className}Controller {
     public AjaxResult remove(@PathVariable Long[] ${pkColumn.javaField}s) {
         boolean success = ${businessName}Service.removeBatchByIds(List.of(${pkColumn.javaField}s));
         return success ? AjaxResult.success("删除成功") : AjaxResult.error("删除失败");
+    }
+
+    /**
+     * 导出${functionName}列表
+     */
+    @GetMapping("/export")
+    @Operation(summary = "导出${functionName}列表")
+    public void export(HttpServletResponse response) {
+        List<${className}> list = ${businessName}Service.select${className}List(null);
+        ExcelUtil<${className}> util = new ExcelUtil<>(${className}.class);
+        util.exportExcel(response, list, "${functionName}数据");
     }
 }

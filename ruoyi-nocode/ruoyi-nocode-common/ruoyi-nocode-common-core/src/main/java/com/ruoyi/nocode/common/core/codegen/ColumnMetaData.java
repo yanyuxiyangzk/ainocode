@@ -69,7 +69,7 @@ public class ColumnMetaData implements Serializable {
     /**
      * 字段名称（大写下划线，如：USER_NAME）
      */
-    private String fieldNameUpper();
+    private String fieldNameUpper;
 
     /**
      * 是否为字典字段

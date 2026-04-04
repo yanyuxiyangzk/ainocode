@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FilePermission;
+import java.lang.reflect.Member;
 import java.net.InetAddress;
 import java.net.NetPermission;
 import java.net.SocketPermission;
@@ -11,6 +12,7 @@ import java.net.URLPermission;
 import java.security.Permission;
 import java.security.Policy;
 import java.security.Security;
+import java.security.SecurityPermission;
 import java.util.PropertyPermission;
 
 /**
@@ -277,8 +279,8 @@ public class SandboxSecurityManager extends SecurityManager {
 
     /**
      * 检查MemberAccess
+     * @deprecated JDK17移除了checkMemberAccess方法
      */
-    @Override
     public void checkMemberAccess(Class<?> clazz, int type) {
         if (type != Member.PUBLIC) {
             throw new SecurityException("Member access denied to: " + clazz);

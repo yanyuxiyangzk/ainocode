@@ -60,36 +60,86 @@ public class LiquorCompilerServiceImpl implements ILiquorCompilerService {
     @Override
     public CompileResult compile(String sourceCode, String className) {
         long startTime = System.currentTimeMillis();
-        
+
         try {
             log.debug("开始编译类: {}", className);
-            
+
             DynamicCompiler localCompiler = getCompiler();
-            
+
             // 添加源代码
             localCompiler.addSource(className, sourceCode);
-            
+
             // 编译
             localCompiler.build();
-            
+
             // 从 DynamicClassLoader 获取编译后的字节码
             org.noear.liquor.DynamicClassLoader loader = localCompiler.getClassLoader();
             org.noear.liquor.MemoryByteCode byteCode = loader.getClassBytes(className);
-            
+
             if (byteCode == null) {
-                return CompileResult.failure("编译失败: 未找到类 " + className + " 的字节码");
+                // 获取编译错误信息
+                String errorMsg = getCompilationErrors(localCompiler, className);
+                log.warn("编译失败: {}, 错误: {}", className, errorMsg);
+                return CompileResult.failure(errorMsg);
             }
-            
+
             byte[] bytecode = byteCode.getByteCode();
             long compileTime = System.currentTimeMillis() - startTime;
             log.debug("编译成功: {}, 耗时: {}ms", className, compileTime);
-            
+
             return CompileResult.success(className, bytecode, compileTime);
-            
+
         } catch (Exception e) {
             log.error("编译失败: {}", className, e);
             return CompileResult.failure("编译异常: " + e.getMessage());
         }
+    }
+
+    /**
+     * 获取Liquor编译器的错误信息
+     * Liquor在编译失败时会将错误信息存储在编译器中
+     */
+    private String getCompilationErrors(DynamicCompiler compiler, String className) {
+        StringBuilder errors = new StringBuilder();
+        errors.append("编译失败: 未找到类 ").append(className).append(" 的字节码");
+
+        // 尝试获取错误信息
+        try {
+            // Liquor编译错误通常可以通过getErrors获取
+            // 但由于不同版本API可能不同，这里做兼容处理
+            java.lang.reflect.Method getErrorsMethod = null;
+            try {
+                getErrorsMethod = compiler.getClass().getMethod("getErrors");
+                @SuppressWarnings("unchecked")
+                java.util.List<String> errorList = (java.util.List<String>) getErrorsMethod.invoke(compiler);
+                if (errorList != null && !errorList.isEmpty()) {
+                    errors.setLength(0);
+                    for (int i = 0; i < errorList.size(); i++) {
+                        if (i > 0) errors.append("; ");
+                        errors.append(errorList.get(i));
+                    }
+                }
+            } catch (NoSuchMethodException e) {
+                // Liquor版本不支持getErrors方法，使用默认错误信息
+                log.debug("Liquor版本不支持getErrors方法");
+            }
+
+            // 尝试获取单条错误信息
+            try {
+                java.lang.reflect.Method getErrorMethod = compiler.getClass().getMethod("getError");
+                Object error = getErrorMethod.invoke(compiler);
+                if (error != null && !error.toString().isEmpty()) {
+                    errors.setLength(0);
+                    errors.append(error.toString());
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        } catch (Exception e) {
+            log.debug("获取编译错误信息失败", e);
+        }
+
+        return errors.toString();
     }
 
     @Override

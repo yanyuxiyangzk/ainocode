@@ -1,6 +1,5 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
  * @author auto-dev
  * @since 2026-04-03
  */
-@Data
 @Entity
 @Table(name = "nocode_workflow_task")
 public class WorkflowTaskEntity {
@@ -30,6 +28,10 @@ public class WorkflowTaskEntity {
     /** 节点名称 */
     @Column(name = "node_name", length = 100)
     private String nodeName;
+
+    /** 节点类型：START, END, TASK, GATEWAY */
+    @Column(name = "node_type", length = 20)
+    private String nodeType;
 
     /** 办理人 */
     @Column(name = "assignee", length = 64)
@@ -91,4 +93,44 @@ public class WorkflowTaskEntity {
     protected void onCreate() {
         createTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getInstanceId() { return instanceId; }
+    public void setInstanceId(Long instanceId) { this.instanceId = instanceId; }
+    public String getNodeId() { return nodeId; }
+    public void setNodeId(String nodeId) { this.nodeId = nodeId; }
+    public String getNodeName() { return nodeName; }
+    public void setNodeName(String nodeName) { this.nodeName = nodeName; }
+    public String getNodeType() { return nodeType; }
+    public void setNodeType(String nodeType) { this.nodeType = nodeType; }
+    public String getAssignee() { return assignee; }
+    public void setAssignee(String assignee) { this.assignee = assignee; }
+    public String getCandidate() { return candidate; }
+    public void setCandidate(String candidate) { this.candidate = candidate; }
+    public String getTaskStatus() { return taskStatus; }
+    public void setTaskStatus(String taskStatus) { this.taskStatus = taskStatus; }
+    public Integer getCountersignCount() { return countersignCount; }
+    public void setCountersignCount(Integer countersignCount) { this.countersignCount = countersignCount; }
+    public Integer getCountersignedCount() { return countersignedCount; }
+    public void setCountersignedCount(Integer countersignedCount) { this.countersignedCount = countersignedCount; }
+    public String getCountersignResult() { return countersignResult; }
+    public void setCountersignResult(String countersignResult) { this.countersignResult = countersignResult; }
+    public Boolean getIsCounterSign() { return isCounterSign; }
+    public void setIsCounterSign(Boolean isCounterSign) { this.isCounterSign = isCounterSign; }
+    public Long getParentTaskId() { return parentTaskId; }
+    public void setParentTaskId(Long parentTaskId) { this.parentTaskId = parentTaskId; }
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public LocalDateTime getDueDate() { return dueDate; }
+    public void setDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getClaimTime() { return claimTime; }
+    public void setClaimTime(LocalDateTime claimTime) { this.claimTime = claimTime; }
+    public LocalDateTime getCompleteTime() { return completeTime; }
+    public void setCompleteTime(LocalDateTime completeTime) { this.completeTime = completeTime; }
 }

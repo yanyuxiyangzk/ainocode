@@ -4,7 +4,8 @@ import com.nocode.admin.service.DatasourceConfigService;
 import com.nocode.core.datasource.DatasourceRegistry;
 import com.nocode.core.entity.DatasourceConfig;
 import com.nocode.core.metadata.MetadataCache;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +15,9 @@ import java.util.List;
  * 数据源初始化加载器
  * 在应用启动时从数据库加载数据源配置
  */
-@Slf4j
 @Component
 public class DatasourceInitializer implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(DatasourceInitializer.class);
     private final DatasourceConfigService configService;
     private final DatasourceRegistry registry;
     private final MetadataCache metadataCache;

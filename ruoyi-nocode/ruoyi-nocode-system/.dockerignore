@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Build outputs
+target/
+*.jar
+*.class
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# Test files
+**/src/test/
+**/test/
+
+# Documentation
+README.md
+LICENSE
+docs/

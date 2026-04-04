@@ -5,7 +5,8 @@ import com.nocode.admin.repository.DatasourceConfigRepository;
 import com.nocode.core.entity.DatabaseType;
 import com.nocode.core.entity.DatasourceConfig;
 import com.nocode.core.datasource.DatasourceRegistry;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +22,10 @@ import java.util.stream.Collectors;
 /**
  * 数据源配置服务
  */
-@Slf4j
 @Service
 public class DatasourceConfigService {
+    private static final Logger log = LoggerFactory.getLogger(DatasourceConfigService.class);
+
     private final DatasourceConfigRepository repository;
     private final DatasourceRegistry datasourceRegistry;
 

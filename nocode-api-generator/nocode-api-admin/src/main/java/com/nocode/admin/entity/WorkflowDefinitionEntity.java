@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 流程定义实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_workflow_definition")
 public class WorkflowDefinitionEntity {
@@ -71,4 +69,30 @@ public class WorkflowDefinitionEntity {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getProcessKey() { return processKey; }
+    public void setProcessKey(String processKey) { this.processKey = processKey; }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
+    public String getDiagramJson() { return diagramJson; }
+    public void setDiagramJson(String diagramJson) { this.diagramJson = diagramJson; }
+    public String getNodeDefinition() { return nodeDefinition; }
+    public void setNodeDefinition(String nodeDefinition) { this.nodeDefinition = nodeDefinition; }
+    public String getSequenceFlow() { return sequenceFlow; }
+    public void setSequenceFlow(String sequenceFlow) { this.sequenceFlow = sequenceFlow; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Boolean getSuspended() { return suspended; }
+    public void setSuspended(Boolean suspended) { this.suspended = suspended; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
 }

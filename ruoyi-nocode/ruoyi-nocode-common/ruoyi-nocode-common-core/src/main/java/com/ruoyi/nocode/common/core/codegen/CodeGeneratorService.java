@@ -176,7 +176,7 @@ public class CodeGeneratorService {
 
             // 统计结果
             long successCount = files.stream().filter(GeneratedFile::isSuccess).count();
-            long failCount = files.stream().filter(f -> !f.isSuccess).count();
+            long failCount = files.stream().filter(f -> !f.isSuccess()).count();
 
             log.info("Code generation completed for table '{}': {} success, {} failed",
                     tableName, successCount, failCount);
@@ -366,7 +366,7 @@ public class CodeGeneratorService {
         }
 
         public long getFailCount() {
-            return files.stream().filter(f -> !f.isSuccess).count();
+            return files.stream().filter(f -> !f.isSuccess()).count();
         }
     }
 }

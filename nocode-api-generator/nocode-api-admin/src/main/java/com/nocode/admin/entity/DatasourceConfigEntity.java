@@ -1,13 +1,11 @@
 package com.nocode.admin.entity;
 
-import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
  * 数据源配置实体类
  */
-@Data
 @Entity
 @Table(name = "nocode_datasource_config")
 public class DatasourceConfigEntity {
@@ -77,4 +75,34 @@ public class DatasourceConfigEntity {
     protected void onUpdate() {
         updateTime = LocalDateTime.now();
     }
+
+    // Manual getters/setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getJdbcUrl() { return jdbcUrl; }
+    public void setJdbcUrl(String jdbcUrl) { this.jdbcUrl = jdbcUrl; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getDriverClassName() { return driverClassName; }
+    public void setDriverClassName(String driverClassName) { this.driverClassName = driverClassName; }
+    public String getDatabaseType() { return databaseType; }
+    public void setDatabaseType(String databaseType) { this.databaseType = databaseType; }
+    public Integer getInitialSize() { return initialSize; }
+    public void setInitialSize(Integer initialSize) { this.initialSize = initialSize; }
+    public Integer getMinIdle() { return minIdle; }
+    public void setMinIdle(Integer minIdle) { this.minIdle = minIdle; }
+    public Integer getMaxActive() { return maxActive; }
+    public void setMaxActive(Integer maxActive) { this.maxActive = maxActive; }
+    public Long getMaxWait() { return maxWait; }
+    public void setMaxWait(Long maxWait) { this.maxWait = maxWait; }
+    public Boolean getEnabled() { return enabled; }
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public LocalDateTime getUpdateTime() { return updateTime; }
+    public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
 }

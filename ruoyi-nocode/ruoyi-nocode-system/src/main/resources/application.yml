@@ -2,6 +2,23 @@ server:
   port: 9201
 
 spring:
+  # Cloud Nacos Discovery - 服务注册与发现
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        register-enabled: true
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        metadata:
+          version: 1.0.0
+          region: default
+          zone: default
+        heart-beat-interval: 5000
+        heart-beat-timeout: 15000
+        healthy: true
+
   # PostgreSQL数据库配置
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -82,7 +99,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
       base-path: /actuator
   endpoint:
     health:
@@ -96,6 +113,25 @@ management:
       enabled: true
     nacos:
       enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Micrometer 指标配置
+micrometer:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    enabled: false
 
 # 日志配置
 logging:
@@ -111,3 +147,26 @@ pf4j:
   pluginsDir: ${PF4J_PLUGINS_DIR:${user.home}/nocode-plugins}
   # 插件临时目录
   tempDir: ${PF4J_TEMP_DIR:${user.home}/nocode-plugins/temp}
+
+# 数据库备份配置
+backup:
+  # 是否启用备份
+  enabled: ${BACKUP_ENABLED:true}
+  # 备份目录
+  backup-dir: ${BACKUP_DIR:./backups}
+  # 保留天数
+  retention-days: ${BACKUP_RETENTION_DAYS:30}
+  # 压缩方式: gzip 或 none
+  compression: ${BACKUP_COMPRESSION:gzip}
+  # S3备份启用
+  s3-enabled: ${BACKUP_S3_ENABLED:false}
+  # S3存储桶
+  s3-bucket: ${BACKUP_S3_BUCKET:ruoyi-nocode-backups}
+  # S3前缀
+  s3-prefix: ${BACKUP_S3_PREFIX:postgresql}
+  # S3端点(用于S3兼容存储)
+  s3-endpoint: ${BACKUP_S3_ENDPOINT:}
+  # 备份策略: daily, weekly, monthly
+  strategy: ${BACKUP_STRATEGY:daily}
+  # 定时备份Cron表达式 (默认每天凌晨2点)
+  schedule: ${BACKUP_SCHEDULE:0 0 2 * * ?}

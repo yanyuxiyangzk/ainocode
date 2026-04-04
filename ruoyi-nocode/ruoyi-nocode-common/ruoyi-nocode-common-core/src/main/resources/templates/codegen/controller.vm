@@ -1,0 +1,62 @@
+package ${table.packageName}.controller;
+
+import com.ruoyi.nocode.common.core.domain.AjaxResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import ${table.packageName}.entity.${table.entityName};
+import ${table.packageName}.service.${table.entityName}Service;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+/**
+ * ${table.tableComment} 前端控制器
+ * @author ${table.author}
+ */
+@RestController
+@RequestMapping("/${table.moduleName}/${table.variableName}")
+public class ${table.entityName}Controller {
+
+    @Autowired
+    private ${table.entityName}Service ${table.variableName}Service;
+
+    /**
+     * 分页查询列表
+     */
+    @GetMapping("/list")
+    public AjaxResult list(@RequestParam(defaultValue = "1") Long pageNum,
+                          @RequestParam(defaultValue = "10") Long pageSize) {
+        Page<${table.entityName}> page = new Page<>(pageNum, pageSize);
+        return AjaxResult.success(${table.variableName}Service.page(page));
+    }
+
+    /**
+     * 获取详情
+     */
+    @GetMapping("/{${table.pkField}}")
+    public AjaxResult getInfo(@PathVariable("${table.pkField}") ${table.pkType} ${table.pkField}) {
+        return AjaxResult.success(${table.variableName}Service.getById(${table.pkField}));
+    }
+
+    /**
+     * 新增
+     */
+    @PostMapping
+    public AjaxResult add(@RequestBody ${table.entityName} ${table.variableName}) {
+        return AjaxResult.success(${table.variableName}Service.save(${table.variableName}));
+    }
+
+    /**
+     * 修改
+     */
+    @PutMapping
+    public AjaxResult edit(@RequestBody ${table.entityName} ${table.variableName}) {
+        return AjaxResult.success(${table.variableName}Service.updateById(${table.variableName}));
+    }
+
+    /**
+     * 删除
+     */
+    @DeleteMapping("/{${table.pkField}}")
+    public AjaxResult remove(@PathVariable("${table.pkField}") ${table.pkType} ${table.pkField}) {
+        return AjaxResult.success(${table.variableName}Service.removeById(${table.pkField}));
+    }
+}

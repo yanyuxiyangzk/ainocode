@@ -1,0 +1,44 @@
+import request from '@/utils/request'
+
+// 查询列表
+export function list${table.entityName}(query) {
+  return request({
+    url: '/${table.moduleName}/${table.variableName}/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询详情
+export function get${table.entityName}(id) {
+  return request({
+    url: '/${table.moduleName}/${table.variableName}/' + id,
+    method: 'get'
+  })
+}
+
+// 新增
+export function add${table.entityName}(data) {
+  return request({
+    url: '/${table.moduleName}/${table.variableName}',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改
+export function update${table.entityName}(data) {
+  return request({
+    url: '/${table.moduleName}/${table.variableName}',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除
+export function del${table.entityName}(id) {
+  return request({
+    url: '/${table.moduleName}/${table.variableName}/' + id,
+    method: 'delete'
+  })
+}

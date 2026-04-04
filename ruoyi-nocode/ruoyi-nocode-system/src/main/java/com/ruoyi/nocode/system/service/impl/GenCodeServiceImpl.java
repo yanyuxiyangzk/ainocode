@@ -39,12 +39,16 @@ public class GenCodeServiceImpl extends ServiceImpl<GenTableMapper, GenTable> im
     private final GenTableColumnMapper genTableColumnMapper;
     private final GenTableMapper genTableMapper;
 
-    // 模板路径
+    // Java 模板路径
     private static final String TPL_ENTITY = "templates/velocity/entity.java.vm";
     private static final String TPL_MAPPER = "templates/velocity/mapper.java.vm";
     private static final String TPL_SERVICE = "templates/velocity/service.java.vm";
     private static final String TPL_SERVICE_IMPL = "templates/velocity/serviceImpl.java.vm";
     private static final String TPL_CONTROLLER = "templates/velocity/controller.java.vm";
+    // Vue 模板路径
+    private static final String TPL_VUE_INDEX = "templates/vue/index.vue.vm";
+    private static final String TPL_VUE_INDEX_EXPORT = "templates/vue/index-export.vue.vm";
+    private static final String TPL_VUE_API = "templates/vue/api.js.vm";
 
     // 默认配置
     private static final String DEFAULT_PACKAGE = "com.ruoyi.nocode.system";
@@ -188,12 +192,17 @@ public class GenCodeServiceImpl extends ServiceImpl<GenTableMapper, GenTable> im
         Map<String, String> dataMap = new LinkedHashMap<>();
         VelocityContext context = prepareContext(genTable);
 
-        // 生成各层代码
+        // 生成Java后端代码
         dataMap.put("entity.java", renderTemplate(TPL_ENTITY, context));
         dataMap.put("mapper.java", renderTemplate(TPL_MAPPER, context));
         dataMap.put("service.java", renderTemplate(TPL_SERVICE, context));
         dataMap.put("serviceImpl.java", renderTemplate(TPL_SERVICE_IMPL, context));
         dataMap.put("controller.java", renderTemplate(TPL_CONTROLLER, context));
+
+        // 生成Vue前端代码
+        dataMap.put("views/vue/index.vue", renderTemplate(TPL_VUE_INDEX, context));
+        dataMap.put("views/vue/index-export.vue", renderTemplate(TPL_VUE_INDEX_EXPORT, context));
+        dataMap.put("api/" + genTable.getBusinessName() + ".js", renderTemplate(TPL_VUE_API, context));
 
         return dataMap;
     }
@@ -396,6 +405,16 @@ public class GenCodeServiceImpl extends ServiceImpl<GenTableMapper, GenTable> im
         String packagePath = packageName.replace(".", "/");
         String fileType = fileName.substring(0, fileName.lastIndexOf("."));
         String subPath;
+
+        // Vue文件处理
+        if (fileName.startsWith("views/vue/")) {
+            // Vue视图文件: views/vue/{businessName}/index.vue
+            return basePath + "/vue/" + className.toLowerCase() + "/" + fileName.substring(fileName.lastIndexOf("/") + 1);
+        }
+        if (fileName.startsWith("api/")) {
+            // API文件: api/{moduleName}/{businessName}.js
+            return basePath + "/api/" + className.toLowerCase() + "/" + fileName.substring(fileName.lastIndexOf("/") + 1);
+        }
 
         switch (fileType) {
             case "entity":

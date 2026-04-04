@@ -434,7 +434,7 @@ public class VueIndexGenerator extends BaseCodeGenerator {
 
         // 处理 capitalizedFieldName
         for (ColumnInfo col : tableInfo.getColumns()) {
-            String capField = col.getCapitalizedFieldName();
+            String capField = col.toCapitalizedFieldName();
             template = template.replace("$column.capitalizedFieldName", capField);
         }
 

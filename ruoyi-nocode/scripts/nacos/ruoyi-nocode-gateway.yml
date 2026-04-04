@@ -1,0 +1,76 @@
+# RuoyiNoCode Gateway Nacos 配置
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ruoyi-nocode-gateway
+
+  cloud:
+    # Sentinel 配置
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1:8080}
+      eager: true
+      scg:
+        fallback:
+          mode: response
+          response-body: '{"code":429,"msg":"请求过于频繁，请稍后再试"}'
+
+    # Gateway 配置
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 认证服务
+        - id: ruoyi-nocode-auth
+          uri: lb://ruoyi-nocode-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+        # 系统服务
+        - id: ruoyi-nocode-system
+          uri: lb://ruoyi-nocode-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+
+      # 全局跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "GET,POST,PUT,DELETE,OPTIONS"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+# Sa-Token 配置
+sa-token:
+  token-name: Authorization
+  timeout: 7200
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# Actuator 健康检查配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# 日志配置
+logging:
+  level:
+    org.springframework.cloud.gateway: info
