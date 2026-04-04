@@ -26,7 +26,7 @@ public class LoginVo implements Serializable {
     /**
      * 访问令牌
      */
-    private String accessToken;
+    private String token;
 
     /**
      * Token 类型
@@ -46,7 +46,7 @@ public class LoginVo implements Serializable {
     /**
      * 用户名
      */
-    private String username;
+    private String userName;
 
     /**
      * 昵称

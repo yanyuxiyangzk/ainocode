@@ -2,6 +2,23 @@ server:
   port: 9200
 
 spring:
+  # Cloud Nacos Discovery - 服务注册与发现
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        register-enabled: true
+        server-addr: ${NACOS_SERVER:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: ${NACOS_GROUP:DEFAULT_GROUP}
+        metadata:
+          version: 1.0.0
+          region: default
+          zone: default
+        heart-beat-interval: 5000
+        heart-beat-timeout: 15000
+        healthy: true
+
   # PostgreSQL数据库配置
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -57,12 +74,47 @@ sa-token:
   token-style: uuid
   is-log: false
 
-# JWT配置
+# JWT安全配置
 jwt:
-  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026}
+  # JWT 签名密钥 (生产环境应使用环境变量或密钥管理服务)
+  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026-very-long-secret-key-for-security}
+  # JWT 签发者
   issuer: ${JWT_ISSUER:ruoyi-nocode}
+  # JWT 主题
   subject: ${JWT_SUBJECT:auth}
-  ttlMillis: ${JWT_TTL:7200000}
+  # Token 过期时间 (毫秒), 默认 2 小时
+  ttl-millis: ${JWT_TTL:7200000}
+  # Token 刷新宽限期 (毫秒), 默认 7 天
+  refresh-tokens: ${JWT_REFRESH_TTL:604800000}
+  # 是否启用刷新 Token
+  refresh-enabled: ${JWT_REFRESH_ENABLED:true}
+  # Token 签发时间偏移量 (毫秒)
+  time-offset: ${JWT_TIME_OFFSET:0}
+
+# 安全配置
+security:
+  # 密码加密配置
+  password:
+    # 密码最小长度
+    min-length: ${PASSWORD_MIN_LENGTH:6}
+    # 密码最大长度
+    max-length: ${PASSWORD_MAX_LENGTH:20}
+    # 是否包含数字
+    require-digit: ${PASSWORD_REQUIRE_DIGIT:true}
+    # 是否包含小写字母
+    require-lowercase: ${PASSWORD_REQUIRE_LOWERCASE:false}
+    # 是否包含大写字母
+    require-uppercase: ${PASSWORD_REQUIRE_UPPERCASE:false}
+    # 是否包含特殊字符
+    require-special-char: ${PASSWORD_REQUIRE_SPECIAL:false}
+  # 登录安全配置
+  login:
+    # 最大失败次数
+    max-failure-count: ${LOGIN_MAX_FAILURE:5}
+    # 锁定时间 (分钟)
+    lock-duration: ${LOGIN_LOCK_DURATION:30}
+    # 是否启用登录 IP 限制
+    ip-limit-enabled: ${LOGIN_IP_LIMIT_ENABLED:false}
 
 # Swagger配置
 springdoc:
@@ -82,7 +134,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
       base-path: /actuator
   endpoint:
     health:
@@ -96,6 +148,25 @@ management:
       enabled: true
     nacos:
       enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Micrometer 指标配置
+micrometer:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    enabled: false
 
 # 日志配置
 logging:

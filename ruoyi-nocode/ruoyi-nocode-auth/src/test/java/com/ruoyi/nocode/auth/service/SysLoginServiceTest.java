@@ -56,11 +56,11 @@ class SysLoginServiceTest {
 
         // 设置登录响应
         mockLoginVo = LoginVo.builder()
-                .accessToken("token-abc-123")
+                .token("token-abc-123")
                 .tokenType("Bearer")
                 .expiresIn(7200L)
                 .userId(1L)
-                .username("admin")
+                .userName("admin")
                 .nickname("管理员")
                 .build();
     }
@@ -82,7 +82,7 @@ class SysLoginServiceTest {
             LoginVo result = loginService.login(loginBody);
 
             assertNotNull(result);
-            assertEquals("token-abc-123", result.getAccessToken());
+            assertEquals("token-abc-123", result.getToken());
             assertEquals(1L, result.getUserId());
         }
     }

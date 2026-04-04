@@ -53,11 +53,11 @@ public class TokenService {
         long timeout = StpUtil.getTokenTimeout();
 
         return LoginVo.builder()
-                .accessToken(token)
+                .token(token)
                 .tokenType(TOKEN_TYPE)
                 .expiresIn(timeout)
                 .userId(userId)
-                .username(username)
+                .userName(username)
                 .nickname(nickname)
                 .build();
     }
