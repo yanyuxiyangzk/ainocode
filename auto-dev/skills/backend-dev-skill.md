@@ -68,19 +68,45 @@ public TableDataInfo list() {
 
 ---
 
-## 开发完成标准
+## 开发完成标准（强制门禁）
 
-- [ ] 代码编译通过 `mvn compile`
-- [ ] 单元测试通过 `mvn test`
-- [ ] 接口文档已更新
-- [ ] 无硬编码敏感信息
-- [ ] 符合命名规范
+**以下所有条件必须全部满足，否则不得提交代码：**
+
+| 门禁 | 命令 | 通过标准 |
+|------|------|----------|
+| ✅ 编译通过 | `mvn compile -q` | 退出码=0，无error |
+| ✅ 单元测试通过 | `mvn test -q` | 退出码=0，失败率≤10% |
+| ✅ 代码规范检查 | `mvn checkstyle:check -q` | 退出码=0 |
+| ✅ 无P0/P1漏洞 | `mvn spotbugs:check -q`（如有配置） | 无P0/P1问题 |
+
+**禁止使用 `-DskipTests` 或 `-Dmaven.test.skip=true` 绕过测试！**
+
+### 自检脚本
+
+```bash
+# 在项目根目录执行自检（必须全部通过）
+cd d:/project/aicoding/item/ainocode/ruoyi-nocode
+JAVA_HOME="D:/Program Files/Java/jdk-17.0.6" mvn compile -q && \
+JAVA_HOME="D:/Program Files/Java/jdk-17.0.6" mvn test -q && \
+echo "✅ 质量门禁全部通过"
+```
+
+### 常见问题处理
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| Lombok没生成getter/setter | JDK17+Lombok不兼容 | 使用 `@Getter @Setter` 显式注解，或升级Lombok版本 |
+| Liquor编译失败 | 类加载器隔离问题 | 检查 IsolatedClassLoaderUtil 配置 |
+| 测试用例失败 | 逻辑错误或环境问题 | 修复代码，不允许跳过 |
 
 ---
 
 ## 输出
 
-完成后通知测试工程师(Tester)进行测试。
+所有门禁通过后，通知测试工程师(Tester)进行测试，并附上：
+- `mvn compile` 输出
+- `mvn test` 测试报告摘要
+- 代码变更列表
 
 ---
 

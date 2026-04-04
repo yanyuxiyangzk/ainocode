@@ -1,7 +1,7 @@
 # 开发任务池
 
 > 按优先级排序的待办任务列表（由Product Manager维护）
-> 最后更新：2026-04-03
+> 最后更新：2026-04-04
 
 ---
 
@@ -19,6 +19,30 @@
 ---
 
 ## P0 - 紧急任务
+
+### TASK-20260404-001
+- **标题**: 修复JDK17+Lombok编译问题
+- **类型**: bugfix
+- **优先级**: P0
+- **负责人**: backend-dev
+- **状态**: pending
+- **影响模块**:
+  - `nocode-api-generator/nocode-api-admin`
+  - `ruoyi-nocode/ruoyi-nocode-system`
+- **问题描述**:
+  - JDK17下Lombok注解处理器无法正常生成getter/setter/log字段
+  - 代码使用了JDK9+特性(List.of(), Map.of(), Optional.isEmpty())但项目target为JDK8
+- **根因**:
+  - JDK17模块系统与Lombok 1.18.30/1.18.32的annotation processor不兼容
+  - pom.xml中未正确配置annotationProcessorPaths
+- **解决方案**:
+  1. 升级Lombok到1.18.34+ (更好的JDK17支持)
+  2. 或在pom.xml中正确配置maven-compiler-plugin的annotationProcessorPaths
+  3. 将代码中的JDK9+特性替换为JDK8兼容写法
+- **验收标准**:
+  - [ ] nocode-api-admin `mvn compile` 成功
+  - [ ] ruoyi-nocode-system `mvn compile` 成功
+  - [ ] 所有单元测试通过
 
 ### TASK-20260403-001
 - **标题**: [P0任务标题]

@@ -5,6 +5,41 @@
 
 ---
 
+## ⚠️ 质量门禁（强制）
+
+**在所有质量门禁通过之前，不得进入测试阶段！**
+
+### Dev 门禁自检
+
+| 门禁 | 命令 | 通过标准 | 实际结果 |
+|------|------|----------|----------|
+| 编译通过 | `mvn compile -q` | 退出码=0 | _ |
+| 测试通过 | `mvn test -q` | 退出码=0 | _ |
+| 规范检查 | `mvn checkstyle:check -q` | 退出码=0 | _ |
+| 无P0漏洞 | 代码扫描 | 0个P0 | _ |
+| 无P1漏洞 | 代码扫描 | 0个P1 | _ |
+
+**自检命令：**
+```bash
+cd d:/project/aicoding/item/ainocode/ruoyi-nocode
+JAVA_HOME="D:/Program Files/Java/jdk-17.0.6" mvn compile -q && mvn test -q && echo "✅ DEV门禁通过"
+```
+
+### Reviewer 门禁
+
+| 迭代 | 审核人 | 时间 | 结果 | 说明 |
+|------|--------|------|------|------|
+| 1/3 | reviewer | - | PENDING | 等待审核 |
+| 2/3 | reviewer | - | - |（如需）|
+| 3/3 | reviewer | - | - |（如需）|
+
+**门禁结果：**
+- [ ] APPROVED - 进入测试阶段
+- [ ] REVISION_REQUESTED - 返回开发修复
+- [ ] REJECTED - 通知PM人工介入
+
+---
+
 ## 基本信息
 
 | 属性 | 值 |
@@ -191,13 +226,15 @@ ALTER TABLE {table_name} ADD COLUMN {column_name} {type};
 
 ### 审核详情
 
-#### 审核标准
-- [ ] 编译成功，无错误
-- [ ] 单元测试通过率 > 90%
-- [ ] 无P0/P1安全漏洞
-- [ ] 无硬编码密钥/密码
+#### 审核标准（严格模式）
+- [ ] 编译成功，无错误（`mvn compile` 退出码=0）
+- [ ] 单元测试通过率 ≥ 90%
+- [ ] **无P0安全漏洞**（SQL注入、硬编码密码、不安全反序列化等）
+- [ ] 无P1安全漏洞（XSS、CSRF、路径遍历等）
+- [ ] 无硬编码密钥/密码/凭证
 - [ ] 命名规范符合RULES.md
 - [ ] 必要的Javadoc注释
+- [ ] `mvn checkstyle:check` 通过
 
 #### 迭代记录
 
@@ -219,15 +256,18 @@ ALTER TABLE {table_name} ADD COLUMN {column_name} {type};
 
 ---
 
-## 自检清单
+## 自检清单（提交前必须全部通过）
 
-- [ ] 代码符合命名规范
-- [ ] 已添加单元测试
+- [ ] `mvn compile -q` 通过（无错误）
+- [ ] `mvn test -q` 通过（测试通过率≥90%）
+- [ ] `mvn checkstyle:check -q` 通过
+- [ ] 已添加单元测试（覆盖率≥70%）
+- [ ] 无安全漏洞（SQL注入、XSS、硬编码密码等）
 - [ ] 已完成接口联调
 - [ ] API文档已更新
-- [ ] 无安全漏洞（SQL注入、XSS等）
 - [ ] 日志记录完整
 - [ ] 异常处理完善
+- [ ] **禁止使用 `-DskipTests` 或 `-Dmaven.test.skip=true`**
 
 ---
 

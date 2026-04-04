@@ -6,7 +6,8 @@ import com.nocode.admin.exception.CodeGenerateException;
 import com.nocode.admin.exception.ResourceNotFoundException;
 import com.nocode.admin.repository.CodeGeneratorConfigRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +20,10 @@ import java.util.*;
 /**
  * 代码生成器Service
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CodeGeneratorService {
+    private static final Logger log = LoggerFactory.getLogger(CodeGeneratorService.class);
 
     private final CodeGeneratorConfigRepository codeGeneratorConfigRepository;
     private final ObjectMapper objectMapper;

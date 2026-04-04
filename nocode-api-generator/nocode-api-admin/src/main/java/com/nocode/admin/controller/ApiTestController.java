@@ -3,7 +3,8 @@ package com.nocode.admin.controller;
 import com.nocode.core.config.NocodeApiProperties;
 import com.nocode.core.entity.ApiResult;
 import com.nocode.core.executor.SqlExecutor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +14,10 @@ import java.util.Map;
 /**
  * API测试控制器
  */
-@Slf4j
 @RestController
 @RequestMapping("/nocode-admin/api/test")
 public class ApiTestController {
+    private static final Logger log = LoggerFactory.getLogger(ApiTestController.class);
     private final SqlExecutor sqlExecutor;
     private final NocodeApiProperties properties;
 

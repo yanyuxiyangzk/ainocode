@@ -11,7 +11,8 @@ import com.nocode.core.entity.TableInfo;
 import com.nocode.core.executor.SqlExecutor;
 import com.nocode.core.metadata.MetadataCache;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,10 @@ import java.util.Map;
 /**
  * 管理界面控制器
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
     private final DatasourceRegistry registry;
     private final MetadataCache metadataCache;
     private final NocodeApiProperties properties;

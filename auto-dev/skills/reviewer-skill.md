@@ -105,30 +105,39 @@ pytest
 }
 ```
 
-## Approval Criteria
+## Approval Criteria（严格模式）
 
-### Compile Success (必须)
-```bash
-mvn compile  # 退出码必须为0
-```
+**所有门禁必须全部通过，否则不得进入测试阶段！**
 
-### Test Pass Rate > 90% (必须)
-```bash
-mvn test  # 失败用例 <= 10%
-```
+### 门禁清单
 
-### No P0/P1 Security Violations (必须)
-扫描以下P0问题：
+| 门禁 | 必须通过 | 失败处理 |
+|------|----------|----------|
+| Compile Success | `mvn compile` 退出码=0 | → REVISION_REQUESTED |
+| Test Pass Rate ≥ 90% | 失败用例≤10% | → REVISION_REQUESTED |
+| No P0 Security Violations | 0个P0漏洞 | → **REJECTED**（立即停止） |
+| No P1 Security Violations | 0个P1漏洞 | → REVISION_REQUESTED |
+| Naming Convention | 符合RULES.md规范 | → REVISION_REQUESTED |
+
+### P0 问题（立即阻塞）
 - SQL注入
-- 硬编码密钥/密码
+- 硬编码密钥/密码/凭证
 - 不安全的反序列化
-- 敏感信息泄露
+- 敏感信息泄露（身份证、银行卡等）
+- 命令注入
 
-扫描以下P1问题：
+### P1 问题（必须修复）
 - XSS
 - CSRF
-- 不安全的加密算法
+- 不安全的加密算法（MD5/SHA1用于安全用途）
 - 路径遍历
+- 权限绕过
+
+### 迭代限制
+
+- **最大迭代次数：3次**
+- 3次迭代内仍有问题 → `REJECTED` → 通知PM人工介入
+- P0问题 → 立即 `REJECTED`，不计入迭代次数
 
 ### Naming Convention (应该)
 符合RULES.md中的命名规范

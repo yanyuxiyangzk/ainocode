@@ -274,24 +274,35 @@ class SelfHealer:
             return False, f"Compilation error: {str(e)}"
 
     def check_tests(self, project_dir: Path) -> Tuple[bool, str]:
-        """检查单元测试"""
+        """检查单元测试 - 必须测试通过率≥90%"""
         pom_file = project_dir / "pom.xml"
         if not pom_file.exists():
             return True, "No pom.xml found, skipping tests"
 
         print("[CHECK] Running mvn test...")
         try:
+            # 使用surefire报告解析（不-quiet，以便获取详细结果）
             result = subprocess.run(
-                ["mvn", "test", "-q"],
+                ["mvn", "test"],
                 cwd=project_dir,
                 capture_output=True,
                 text=True,
                 timeout=600
             )
+
+            # 解析测试结果
+            output = result.stdout + result.stderr
+            pass_rate, total, failures = self._parse_test_results(output)
+
             if result.returncode == 0:
-                return True, "Tests passed"
+                if pass_rate is not None and pass_rate < 90:
+                    return False, f"Test pass rate {pass_rate}% < 90% (failures: {failures}/{total})"
+                return True, f"Tests passed (pass rate: {pass_rate or 'unknown'}%)"
             else:
-                return False, f"Tests failed: {result.stderr[:500]}"
+                if pass_rate is not None and pass_rate >= 90:
+                    return True, f"Tests passed with {pass_rate}% (some errors in setup)"
+                return False, f"Tests failed: {failures}/{total} failed. Check surefire reports."
+
         except subprocess.TimeoutExpired:
             return False, "Tests timeout (>10min)"
         except FileNotFoundError:
@@ -299,37 +310,86 @@ class SelfHealer:
         except Exception as e:
             return False, f"Test error: {str(e)}"
 
+    def _parse_test_results(self, output: str) -> Tuple:
+        """解析Maven测试输出，获取通过率"""
+        import re
+        # 匹配 "Tests run: 100, Failures: 2, Errors: 0, Skipped: 0"
+        pattern = r'Tests run:\s*(\d+),\s*Failures:\s*(\d+),\s*Errors:\s*(\d+),\s*Skipped:\s*(\d+)'
+        match = re.search(pattern, output)
+        if match:
+            total = int(match.group(1))
+            failures = int(match.group(2))
+            errors = int(match.group(3))
+            skipped = int(match.group(4))
+            if total > 0:
+                passed = total - failures - errors - skipped
+                pass_rate = (passed / total) * 100
+                return pass_rate, total, failures + errors
+        return None, 0, 0
+
     def check_security(self, file_path: Path) -> List[Dict]:
-        """检查安全规则"""
+        """检查安全规则 - P0/P1漏洞检测"""
         violations = []
 
-        # 敏感信息模式
-        sensitive_patterns = [
-            (r'password\s*=\s*["\'][^"\']{1,30}["\']', "硬编码密码"),
-            (r'secret\s*=\s*["\'][^"\']{1,30}["\']', "硬编码密钥"),
-            (r'api[_-]?key\s*=\s*["\'][^"\']{1,30}["\']', "硬编码API密钥"),
-            (r'jwt[_-]?secret\s*=\s*["\'][^"\']{1,30}["\']', "硬编码JWT密钥"),
-            (r'token\s*=\s*["\'][^"\']{1,30}["\']', "硬编码令牌"),
+        # P0 安全漏洞模式（立即阻塞）
+        p0_patterns = [
+            # 硬编码凭证
+            (r'password\s*=\s*["\'][^"\']{3,30}["\']', "硬编码密码", "P0"),
+            (r'secret\s*=\s*["\'][^"\']{3,30}["\']', "硬编码密钥", "P0"),
+            (r'api[_-]?key\s*=\s*["\'][^"\']{3,30}["\']', "硬编码API密钥", "P0"),
+            (r'jwt[_-]?secret\s*=\s*["\'][^"\']{3,30}["\']', "硬编码JWT密钥", "P0"),
+            (r'token\s*=\s*["\'][^"\']{10,50}["\']', "硬编码令牌", "P0"),
+            (r'aws[_-]?secret\s*=\s*["\'][^"\']{3,30}["\']', "硬编码AWS密钥", "P0"),
+            # SQL注入风险
+            (r'executeQuery\s*\(\s*["\'].*\+.*["\']', "SQL注入风险", "P0"),
+            (r'executeUpdate\s*\(\s*["\'].*\+.*["\']', "SQL注入风险", "P0"),
+            (r'createStatement\(\).*executeQuery.*\+', "SQL注入风险", "P0"),
+            # 不安全反序列化
+            (r'ObjectInputStream\s*\(', "不安全反序列化", "P0"),
+            (r'readObject\s*\(', "不安全的反序列化调用", "P0"),
+            # 命令注入
+            (r'Runtime\.getRuntime\(\)\.exec\s*\(', "命令注入风险", "P0"),
         ]
+
+        # P1 安全漏洞模式（必须修复）
+        p1_patterns = [
+            # XSS
+            (r'innerHTML\s*=', "XSS风险: innerHTML赋值", "P1"),
+            (r'document\.write\s*\(', "XSS风险: document.write", "P1"),
+            (r'v-html\s*=', "XSS风险: v-html指令", "P1"),
+            # 路径遍历
+            (r'new\s+File\s*\(\s*.*\+.*request', "路径遍历风险", "P1"),
+            (r'Paths\.get\s*\(\s*.*\+', "路径遍历风险", "P1"),
+            # 不安全加密
+            (r'MessageDigest\.getInstance\s*\(\s*["\']MD5', "不安全加密算法: MD5", "P1"),
+            (r'SecretKeySpec\s*\(\s*.*MD5', "不安全加密算法: MD5", "P1"),
+            (r'new\s+Random\(\)', "不安全的随机数生成", "P1"),
+            # CSRF
+            (r'@csrf\s*=\s*false', "CSRF保护被禁用", "P1"),
+        ]
+
+        all_patterns = p0_patterns + p1_patterns
 
         if file_path.suffix in ['.java', '.js', '.ts', '.vue', '.py', '.yml', '.yaml', '.properties']:
             try:
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
 
-                for pattern, desc in sensitive_patterns:
+                for pattern, desc, severity in all_patterns:
                     matches = re.finditer(pattern, content, re.IGNORECASE)
                     for match in matches:
-                        # 排除环境变量赋值
-                        if 'env' not in match.group(0).lower():
-                            violations.append({
-                                'file': str(file_path),
-                                'rule': 'SECURITY',
-                                'type': desc,
-                                'line': content[:match.start()].count('\n') + 1,
-                                'message': f"禁止硬编码敏感信息: {desc}",
-                                'severity': 'P0'
-                            })
+                        # 排除环境变量赋值（但P0的硬编码凭证即使在env里也可能有问题）
+                        matched_text = match.group(0).lower()
+                        if 'env' in matched_text and severity != 'P0':
+                            continue
+                        violations.append({
+                            'file': str(file_path),
+                            'rule': 'SECURITY',
+                            'type': desc,
+                            'line': content[:match.start()].count('\n') + 1,
+                            'message': f"安全漏洞[{severity}]: {desc}",
+                            'severity': severity
+                        })
             except Exception as e:
                 pass
 
@@ -494,10 +554,15 @@ class SelfHealer:
             for rule, count in dir_result['violations_by_rule'].items():
                 print(f"  {rule}: {count}")
 
-            # P0违规必须修复
+            # P0违规必须修复（P0=立即阻塞）
             if dir_result['violations_by_severity'].get('P0', 0) > 0:
                 all_passed = False
                 messages.append("P0 violations must be fixed before commit")
+
+            # P1违规必须修复（P1=必须修复才能提交）
+            if dir_result['violations_by_severity'].get('P1', 0) > 0:
+                all_passed = False
+                messages.append("P1 violations must be fixed before commit")
 
         if all_passed:
             return True, "All pre-commit checks passed"
@@ -510,14 +575,20 @@ class SelfHealer:
         print("=" * 60)
 
         if stage == "development":
-            # 开发阶段：至少要能编译
+            # 开发阶段：编译 + P0安全检查
             compile_ok, msg = self.check_compile(directory)
             if not compile_ok:
                 return False, f"Compile failed: {msg}"
+
+            # 开发阶段也要检查P0漏洞
+            dir_result = self.check_directory(directory)
+            p0_count = dir_result['violations_by_severity'].get('P0', 0)
+            if p0_count > 0:
+                return False, f"P0 security violations found: {p0_count} (must fix before testing)"
             return True, "Development gate passed"
 
         elif stage == "testing":
-            # 测试阶段：必须编译+测试通过
+            # 测试阶段：必须编译+测试通过+P0/P1安全检查
             compile_ok, compile_msg = self.check_compile(directory)
             if not compile_ok:
                 return False, f"Compile failed: {compile_msg}"
@@ -525,6 +596,15 @@ class SelfHealer:
             test_ok, test_msg = self.check_tests(directory)
             if not test_ok:
                 return False, f"Tests failed: {test_msg}"
+
+            # 测试阶段也要检查安全漏洞
+            dir_result = self.check_directory(directory)
+            p0_count = dir_result['violations_by_severity'].get('P0', 0)
+            p1_count = dir_result['violations_by_severity'].get('P1', 0)
+            if p0_count > 0:
+                return False, f"P0 security violations: {p0_count} (must fix)"
+            if p1_count > 0:
+                return False, f"P1 security violations: {p1_count} (must fix)"
 
             return True, "Testing gate passed"
 

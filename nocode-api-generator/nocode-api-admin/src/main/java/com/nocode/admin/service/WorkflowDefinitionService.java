@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -164,7 +165,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public WorkflowInstanceEntity startProcess(Long definitionId, String applicant, String businessKey) {
         Optional<WorkflowDefinitionEntity> definition = workflowDefinitionRepository.findById(definitionId);
-        if (definition.isEmpty()) {
+        if (!definition.isPresent()) {
             throw new ResourceNotFoundException("Workflow definition", definitionId);
         }
 
@@ -234,7 +235,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public WorkflowInstanceEntity completeTask(Long instanceId, String userId, String comment) {
         Optional<WorkflowInstanceEntity> existing = workflowInstanceRepository.findById(instanceId);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Workflow instance", instanceId);
         }
 
@@ -275,7 +276,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public Map<String, Object> counterSign(Long instanceId, String userId, boolean agree, String comment) {
         Optional<WorkflowInstanceEntity> existing = workflowInstanceRepository.findById(instanceId);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Workflow instance", instanceId);
         }
 
@@ -339,13 +340,13 @@ public class WorkflowDefinitionService {
 
         workflowInstanceRepository.save(instance);
 
-        return Map.of(
-                "counterSignComplete", counterSignComplete,
-                "outcome", outcome,
-                "totalCount", totalCount,
-                "agreeCount", agreeCount,
-                "rejectCount", rejectCount
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("counterSignComplete", counterSignComplete);
+        result.put("outcome", outcome);
+        result.put("totalCount", totalCount);
+        result.put("agreeCount", agreeCount);
+        result.put("rejectCount", rejectCount);
+        return result;
     }
 
     /**
@@ -359,7 +360,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public WorkflowInstanceEntity rejectToPreviousNode(Long instanceId, String userId, String comment) {
         Optional<WorkflowInstanceEntity> existing = workflowInstanceRepository.findById(instanceId);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Workflow instance", instanceId);
         }
 
@@ -419,7 +420,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public WorkflowTaskEntity transferTask(Long instanceId, String userId, String targetUserId, String reason) {
         Optional<WorkflowInstanceEntity> existing = workflowInstanceRepository.findById(instanceId);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Workflow instance", instanceId);
         }
 
@@ -476,7 +477,7 @@ public class WorkflowDefinitionService {
     @Transactional
     public WorkflowInstanceEntity cancelProcess(Long instanceId, String userId, String reason) {
         Optional<WorkflowInstanceEntity> existing = workflowInstanceRepository.findById(instanceId);
-        if (existing.isEmpty()) {
+        if (!existing.isPresent()) {
             throw new ResourceNotFoundException("Workflow instance", instanceId);
         }
 
