@@ -363,10 +363,58 @@
 
 ---
 
+### TASK-20260404-001 - OpenSwarm 24小时无人值守开发系统
+
+**基本信息**:
+- ID: TASK-20260404-001
+- 标题: 实现OpenSwarm 24小时无人值守开发系统
+- 类型: feature
+- 优先级: P0
+- 创建时间: 2026-04-04 00:00
+- 完成时间: 2026-04-04
+- 负责人: orchestrator
+
+**任务详情**:
+- **目标**: 为auto-dev添加24小时无人值守开发能力
+- **验收标准**:
+  - [x] Reviewer Agent审核循环（最多3次迭代）
+  - [x] Pace控制（5小时滚动窗口任务数限制）
+  - [x] Stuck检测（死循环检测）
+  - [x] 任务持久化（checkpoint恢复）
+  - [x] 模型升级机制（Haoku→Sonnet自动升级）
+  - [x] Discord通知
+  - [x] SelfHealer自动修复
+  - [x] 时间窗口控制
+
+**代码变更**:
+- 新增文件:
+  - `auto-dev/agents/reviewer.md` - Reviewer角色定义
+  - `auto-dev/skills/reviewer-skill.md` - 审核标准
+  - `auto-dev/scripts/pace_control.py` - Pace控制
+  - `auto-dev/scripts/checkpoint_ops.py` - 任务持久化
+  - `auto-dev/scripts/model_escalation.py` - 模型升级
+  - `auto-dev/scripts/notification_ops.py` - Discord通知
+  - `auto-dev/scripts/rule_guard.py` - StuckDetector + SelfHealer
+  - `auto-dev/scripts/orchestrator_ops.py` - 时间窗口控制
+- 修改文件:
+  - `auto-dev/tasks/pipeline/03-code-TEMPLATE.md` - 添加review section
+
+**实现要点**:
+1. Reviewer审核：编译成功、测试通过率>90%、无P0安全漏洞
+2. Pace控制：5小时滚动窗口最多3个任务，30分钟冷却间隔
+3. Stuck检测：3次相同错误触发检测
+4. Checkpoint：每10分钟自动保存，支持重启恢复
+5. 模型升级：3次错误后Haiku→Sonnet
+6. Discord通知：pipeline_complete、pipeline_blocked、stuck_detected
+7. SelfHealer：可自愈依赖解析、缓存损坏、格式问题
+8. 时间窗口：支持工作时间和周末配置
+
+---
+
 ## 统计
 
 | 指标 | 数量 |
 |------|------|
-| 本周完成 | 6 |
-| 本月完成 | 6 |
-| 累计完成 | 6 |
+| 本周完成 | 7 |
+| 本月完成 | 7 |
+| 累计完成 | 7 |
