@@ -1,0 +1,64 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm get all {{ .Release.Name }}
+
+To check the status of your release:
+
+  $ helm status {{ .Release.Name }}
+
+To verify the deployment:
+
+  $ kubectl get pods -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+
+To get the service endpoints:
+
+  $ kubectl get svc -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+
+== Service Endpoints ==
+
+{{- if .Values.gateway.enabled }}
+Gateway Service:
+  http://gateway.ruoyi.local (via Ingress)
+  or kubectl port-forward svc/{{ include "ruoyi-nocode.fullname" . }}-gateway 8080:8080 -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+{{- end }}
+
+{{- if .Values.auth.enabled }}
+Auth Service:
+  kubectl port-forward svc/{{ include "ruoyi-nocode.fullname" . }}-auth 9201:9201 -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+{{- end }}
+
+{{- if .Values.system.enabled }}
+System Service:
+  kubectl port-forward svc/{{ include "ruoyi-nocode.fullname" . }}-system 9200:9200 -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+{{- end }}
+
+== Default Credentials ==
+
+Nacos: nacos / nacos
+PostgreSQL: ods / Test@123 (configured in values)
+
+== Monitoring ==
+
+{{- if .Values.monitoring.enabled }}
+Prometheus: Run 'kubectl port-forward svc/prometheus-server 9090:80'
+Grafana: Run 'kubectl port-forward svc/grafana 3000:80'
+{{- end }}
+
+== Next Steps ==
+
+1. Configure the ingress DNS record to point to your ingress controller
+2. Update the JWT secret in production: --set security.jwt.secret=your-secret-key
+3. Enable external database for HA: --set postgresql-ha.enabled=true
+4. Review and adjust resource limits based on your workload
+
+== Uninstallation ==
+
+To uninstall/delete the {{ .Release.Name }} release:
+
+  $ helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace | default "ruoyi-nocode" }}
+
+The above command removes all the Kubernetes resources associated with the chart and deletes the release.

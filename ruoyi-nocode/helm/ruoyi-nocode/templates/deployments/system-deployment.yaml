@@ -1,0 +1,115 @@
+{{- if .Values.system.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-system
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Values.image.tag | default "latest" }}
+    app.kubernetes.io/component: system
+spec:
+  replicas: {{ .Values.system.replicaCount | default 2 }}
+  selector:
+    matchLabels:
+      app: {{ include "ruoyi-nocode.fullname" . }}-system
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9200"
+        prometheus.io/path: "/actuator/prometheus"
+      labels:
+        app: {{ include "ruoyi-nocode.fullname" . }}-system
+        app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-system
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Values.image.tag | default "latest" }}
+    spec:
+      serviceAccountName: {{ include "ruoyi-nocode.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: system
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.system.image.repository | default "ruoyi-nocode-system" }}:{{ .Values.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.system.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9200
+              protocol: TCP
+          env:
+            - name: NACOS_SERVER
+              value: {{ .Values.system.env.NACOS_SERVER | default "nacos:8848" }}
+            - name: NACOS_NAMESPACE
+              value: {{ .Values.system.env.NACOS_NAMESPACE | default "public" }}
+            - name: NACOS_GROUP
+              value: {{ .Values.system.env.NACOS_GROUP | default "DEFAULT_GROUP" }}
+            - name: DB_HOST
+              value: {{ .Values.system.env.DB_HOST | default "postgresql.primary" }}
+            - name: DB_PORT
+              value: {{ .Values.system.env.DB_PORT | default "5432" | quote }}
+            - name: DB_NAME
+              value: {{ .Values.system.env.DB_NAME | default "cost" }}
+            - name: DB_USER
+              value: {{ .Values.system.env.DB_USER | default "ods" }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ruoyi-nocode.fullname" . }}-postgresql
+                  key: password
+                  optional: true
+            - name: REDIS_HOST
+              value: {{ .Values.system.env.REDIS_HOST | default "redis-master" }}
+            - name: REDIS_PORT
+              value: {{ .Values.system.env.REDIS_PORT | default "6379" | quote }}
+            - name: REDIS_DATABASE
+              value: {{ .Values.system.env.REDIS_DATABASE | default "0" | quote }}
+            - name: JWT_SECRET
+              value: {{ .Values.security.jwt.secret | default "ruoyi-nocode-secret-key-2026" }}
+            - name: JWT_TTL
+              value: {{ .Values.security.jwt.ttl | default "7200000" | quote }}
+            - name: PF4J_ENABLED
+              value: {{ .Values.system.env.PF4J_ENABLED | default "true" }}
+            - name: JAVA_OPTS
+              value: "-Xms{{ .Values.system.jvm.xms | default "256m" }} -Xmx{{ .Values.system.jvm.xmx | default "512m" }} -Xmn{{ .Values.system.jvm.xmn | default "128m" }}"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.system.resources | nindent 10 }}
+          volumeMounts:
+            - name: plugins
+              mountPath: /home/nocode-plugins
+      volumes:
+        - name: plugins
+          emptyDir: {}
+      {{- with .Values.system.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.system.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.system.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,372 @@
+# Default values for ruoyi-nocode
+
+namespace: ruoyi-nocode
+
+# 全局配置
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets: []
+  storageClass: ""
+
+# 镜像配置
+image:
+  gateway: ruoyi-nocode-gateway
+  auth: ruoyi-nocode-auth
+  system: ruoyi-nocode-system
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# 服务配置
+gateway:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: ruoyi-nocode-gateway
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    hosts:
+      - host: gateway.ruoyi.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  # JVM 配置
+  jvm:
+    xms: 256m
+    xmx: 512m
+    xmn: 128m
+
+  env:
+    NACOS_SERVER: nacos:8848
+    NACOS_NAMESPACE: public
+    NACOS_GROUP: DEFAULT_GROUP
+    REDIS_HOST: redis-master
+    REDIS_PORT: 6379
+    REDIS_DATABASE: "0"
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  podAnnotations: {}
+  podLabels: {}
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+auth:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: ruoyi-nocode-auth
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9201
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  jvm:
+    xms: 256m
+    xmx: 512m
+    xmn: 128m
+
+  env:
+    DB_HOST: postgresql.primary
+    DB_PORT: "5432"
+    DB_NAME: cost
+    DB_USER: ods
+    REDIS_HOST: redis-master
+    REDIS_PORT: "6379"
+    REDIS_DATABASE: "0"
+    JWT_SECRET: ruoyi-nocode-secret-key-2026
+    JWT_TTL: "7200000"
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  podAnnotations: {}
+  podLabels: {}
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+system:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: ruoyi-nocode-system
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9200
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  jvm:
+    xms: 256m
+    xmx: 512m
+    xmn: 128m
+
+  env:
+    DB_HOST: postgresql.primary
+    DB_PORT: "5432"
+    DB_NAME: cost
+    DB_USER: ods
+    REDIS_HOST: redis-master
+    REDIS_PORT: "6379"
+    REDIS_DATABASE: "0"
+    JWT_SECRET: ruoyi-nocode-secret-key-2026
+    JWT_TTL: "7200000"
+    PF4J_ENABLED: "true"
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  podAnnotations: {}
+  podLabels: {}
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# PostgreSQL 配置
+postgresql:
+  enabled: true
+  auth:
+    database: cost
+    username: ods
+    password: Test@123
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  readReplicas:
+    replicaCount: 2
+
+# Redis 配置
+redis:
+  enabled: true
+  auth:
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  replica:
+    replicaCount: 2
+
+# Nacos 配置
+nacos:
+  enabled: false  # 使用外部 Nacos 时设为 false
+  fullnameOverride: nacos
+  persistence:
+    enabled: true
+    size: 5Gi
+  service:
+    type: ClusterIP
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Ingress 配置
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  hosts:
+    - host: gateway.ruoyi.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  # tls:
+  #   - secretName: ruoyi-tls
+  #     hosts:
+  #       - gateway.ruoyi.local
+
+# 配置中心 (使用 Nacos)
+config:
+  enabled: true
+  nacos:
+    serverAddr: nacos:8848
+    namespace: public
+    group: DEFAULT_GROUP
+
+# 监控配置
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+
+# 安全配置
+security:
+  # 密钥管理 (生产环境应使用外部密钥管理服务)
+  jwt:
+    secret: ruoyi-nocode-secret-key-2026
+    ttl: 7200000
+  # IP 白名单
+  ipWhitelist:
+    enabled: false
+    addresses:
+      - 127.0.0.1
+      - 192.168.0.0/16
+      - 10.0.0.0/8
+
+# 高可用配置
+highAvailability:
+  enabled: true
+  # 数据库主从复制
+  database:
+    ha: true
+    replication: true
+  # Redis 集群/主从
+  redis:
+    ha: true
+    cluster: false
+    masterSlave: true
+  # Nacos 集群
+  nacos:
+    ha: false
+    replicas: 3
+
+# 探针配置
+probes:
+  liveness:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readiness:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Pod 中断预算
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# 网络策略
+networkPolicy:
+  enabled: false
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+
+# 持久化配置
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# 日志配置
+logging:
+  level: info
+  pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    maxSize: 100MB
+    maxHistory: 30
+
+# ServiceAccount 配置
+serviceAccount:
+  create: true
+  name: ruoyi-nocode
+  annotations: {}
+
+# RBAC 配置
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "services", "endpoints", "configmaps", "secrets"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

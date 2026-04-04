@@ -1,0 +1,148 @@
+version: '3.8'
+
+# Nacos Cluster High Availability Deployment
+# 3-node Nacos cluster with PostgreSQL backend
+
+services:
+  # Nacos Node 1
+  nacos-1:
+    image: nacos/nacos-server:v2.2.3
+    container_name: nacos-1
+    restart: unless-stopped
+    environment:
+      MODE: cluster
+      NACOS_SERVERS: "nacos-1:8848 nacos-2:8848 nacos-3:8848"
+      MYSQL_SERVICE_HOST: postgres
+      MYSQL_SERVICE_PORT: 5432
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: ods
+      MYSQL_SERVICE_PASSWORD: Test@123
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+      NACOS_AUTH_ENABLE: false
+      PREFER_HOST_MODE: hostname
+      EMBEDDED_STORAGE: postgres
+    ports:
+      - "8841:8848"
+      - "9841:9848"
+    volumes:
+      - nacos_data_1:/home/nacos/data
+      - ./logs:/home/nacos/logs
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Nacos Node 2
+  nacos-2:
+    image: nacos/nacos-server:v2.2.3
+    container_name: nacos-2
+    restart: unless-stopped
+    environment:
+      MODE: cluster
+      NACOS_SERVERS: "nacos-1:8848 nacos-2:8848 nacos-3:8848"
+      MYSQL_SERVICE_HOST: postgres
+      MYSQL_SERVICE_PORT: 5432
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: ods
+      MYSQL_SERVICE_PASSWORD: Test@123
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+      NACOS_AUTH_ENABLE: false
+      PREFER_HOST_MODE: hostname
+      EMBEDDED_STORAGE: postgres
+    ports:
+      - "8842:8848"
+      - "9842:9848"
+    volumes:
+      - nacos_data_2:/home/nacos/data
+      - ./logs:/home/nacos/logs
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Nacos Node 3
+  nacos-3:
+    image: nacos/nacos-server:v2.2.3
+    container_name: nacos-3
+    restart: unless-stopped
+    environment:
+      MODE: cluster
+      NACOS_SERVERS: "nacos-1:8848 nacos-2:8848 nacos-3:8848"
+      MYSQL_SERVICE_HOST: postgres
+      MYSQL_SERVICE_PORT: 5432
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: ods
+      MYSQL_SERVICE_PASSWORD: Test@123
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+      NACOS_AUTH_ENABLE: false
+      PREFER_HOST_MODE: hostname
+      EMBEDDED_STORAGE: postgres
+    ports:
+      - "8843:8848"
+      - "9843:9848"
+    volumes:
+      - nacos_data_3:/home/nacos/data
+      - ./logs:/home/nacos/logs
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Nginx as load balancer for Nacos cluster
+  nacos-ingress:
+    image: nginx:alpine
+    container_name: nacos-ingress
+    restart: unless-stopped
+    ports:
+      - "8848:8848"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      - nacos-1
+      - nacos-2
+      - nacos-3
+
+networks:
+  ruoyi-nocode-network:
+    name: ruoyi-nocode-network
+    driver: bridge
+
+volumes:
+  nacos_data_1:
+    name: nacos-data-1
+  nacos_data_2:
+    name: nacos-data-2
+  nacos_data_3:
+    name: nacos-data-3

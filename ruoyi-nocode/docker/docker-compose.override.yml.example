@@ -1,0 +1,39 @@
+# Docker Compose Override Configuration
+# Copy this file to docker-compose.override.yml and customize for your environment
+# This file is automatically loaded by docker-compose
+
+version: '3.8'
+
+services:
+  # Override gateway service configuration
+  gateway:
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m -Xmn256m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+
+  # Override auth service configuration
+  auth:
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m -Xmn256m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
+
+  # Override system service configuration
+  system:
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m -Xmn256m
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M

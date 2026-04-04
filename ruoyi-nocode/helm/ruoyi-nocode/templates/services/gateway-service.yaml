@@ -1,0 +1,82 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: gateway
+  {{- with .Values.gateway.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.gateway.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.gateway.service.port | default 8080 }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.auth.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-auth
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-auth
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-auth
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: auth
+  {{- with .Values.auth.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.auth.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.auth.service.port | default 9201 }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "ruoyi-nocode.fullname" . }}-auth
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.system.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-system
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: system
+  {{- with .Values.system.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.system.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.system.service.port | default 9200 }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

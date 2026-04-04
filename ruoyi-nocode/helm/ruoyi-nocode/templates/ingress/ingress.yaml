@@ -1,0 +1,42 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- toYaml .hosts | nindent 8 }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ $.Values.gateway.enabled | ternary (printf "%s-gateway" (include "ruoyi-nocode.fullname" $)) (printf "%s-auth" (include "ruoyi-nocode.fullname" $)) }}
+                port:
+                  number: {{ $.Values.gateway.service.port | default 8080 }}
+          {{- end }}
+    {{- end }}
+{{- end }}

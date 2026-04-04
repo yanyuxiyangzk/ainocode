@@ -1,0 +1,72 @@
+# RuoYi NoCode System Service Configuration
+# Group: MICROSERVICE_GROUP
+# Environment: Development
+
+server:
+  port: 9200
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:cost}
+    username: ${DB_USER:ods}
+    password: ${DB_PASSWORD:Test@123}
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+
+# Sa-Token配置
+sa-token:
+  token-name: Authorization
+  timeout: 7200
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026}
+  issuer: ${JWT_ISSUER:ruoyi-nocode}
+  subject: ${JWT_SUBJECT:auth}
+  ttl-millis: ${JWT_TTL:7200000}
+  refresh-tokens: ${JWT_REFRESH_TTL:604800000}
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.ruoyi.nocode.**.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: delFlag
+      logic-delete-value: 2
+      logic-not-delete-value: 0
+
+# PF4J 插件配置
+pf4j:
+  enabled: true
+  pluginsDir: ${PF4J_PLUGINS_DIR:/home/nocode-plugins}
+  tempDir: ${PF4J_TEMP_DIR:/home/nocode-plugins/temp}
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi.nocode: debug
+    org.pf4j: debug

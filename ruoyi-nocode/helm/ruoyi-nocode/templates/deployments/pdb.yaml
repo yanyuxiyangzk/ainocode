@@ -1,0 +1,72 @@
+{{- if and .Values.podDisruptionBudget.enabled (ge (int .Capabilities.KubeVersion.Minor) 21) -}}
+{{- if .Values.gateway.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.auth.enabled -}}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-auth
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-auth
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "ruoyi-nocode.fullname" . }}-auth
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- if .Values.system.enabled -}}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-system
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "ruoyi-nocode.fullname" . }}-system
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+{{- end }}

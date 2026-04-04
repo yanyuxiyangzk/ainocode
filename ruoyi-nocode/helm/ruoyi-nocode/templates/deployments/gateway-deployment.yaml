@@ -1,0 +1,89 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Values.image.tag | default "latest" }}
+    app.kubernetes.io/component: gateway
+spec:
+  replicas: {{ .Values.gateway.replicaCount | default 2 }}
+  selector:
+    matchLabels:
+      app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+      labels:
+        app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+        app.kubernetes.io/name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Values.image.tag | default "latest" }}
+    spec:
+      serviceAccountName: {{ include "ruoyi-nocode.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: gateway
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.gateway.image.repository | default "ruoyi-nocode-gateway" }}:{{ .Values.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: NACOS_SERVER
+              value: {{ .Values.gateway.env.NACOS_SERVER | default "nacos:8848" }}
+            - name: NACOS_NAMESPACE
+              value: {{ .Values.gateway.env.NACOS_NAMESPACE | default "public" }}
+            - name: NACOS_GROUP
+              value: {{ .Values.gateway.env.NACOS_GROUP | default "DEFAULT_GROUP" }}
+            - name: REDIS_HOST
+              value: {{ .Values.gateway.env.REDIS_HOST | default "redis-master" }}
+            - name: REDIS_PORT
+              value: {{ .Values.gateway.env.REDIS_PORT | default "6379" | quote }}
+            - name: REDIS_DATABASE
+              value: {{ .Values.gateway.env.REDIS_DATABASE | default "0" | quote }}
+            - name: JAVA_OPTS
+              value: "-Xms{{ .Values.gateway.jvm.xms | default "256m" }} -Xmx{{ .Values.gateway.jvm.xmx | default "512m" }} -Xmn{{ .Values.gateway.jvm.xmn | default "128m" }}"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.gateway.resources | nindent 10 }}
+      {{- with .Values.gateway.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gateway.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.gateway.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

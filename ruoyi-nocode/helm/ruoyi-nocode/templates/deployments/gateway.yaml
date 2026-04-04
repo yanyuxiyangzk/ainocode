@@ -1,0 +1,211 @@
+{{- define "ruoyi-nocode.deployment.common" -}}
+{{- $ := index . 0 -}}
+{{- $name := index . 1 -}}
+{{- $svc := index . 2 -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace | default $.Values.namespace }}
+  labels:
+    app: {{ $name }}
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/version: {{ $.Values.image.tag | default "latest" }}
+    app.kubernetes.io/component: {{ $svc.component | default "microservice" }}
+spec:
+  replicas: {{ $svc.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  {{- with $svc.strategy }}
+  strategy:
+    type: {{ .type | default "RollingUpdate" }}
+    {{- if eq .type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .rollingUpdate.maxSurge | default "25%" }}
+      maxUnavailable: {{ .rollingUpdate.maxUnavailable | default "25%" }}
+    {{- end }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with $svc.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ $name }}
+        app.kubernetes.io/name: {{ $name }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+        app.kubernetes.io/version: {{ $.Values.image.tag | default "latest" }}
+        {{- with $svc.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: {{ include "ruoyi-nocode.serviceAccountName" $ }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      {{- with $svc.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: "{{ $.Values.global.imageRegistry }}/{{ $svc.image.repository | default $name }}:{{ $.Values.image.tag | default $.Values.global.imageTag | default "latest" }}"
+          imagePullPolicy: {{ $svc.image.pullPolicy | default $.Values.image.pullPolicy }}
+          {{- with $svc.command }}
+          command:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with $svc.args }}
+          args:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $svc.service.port | default 8080 }}
+              protocol: TCP
+            {{- if $svc.service.metricsPort }}
+            - name: metrics
+              containerPort: {{ $svc.service.metricsPort }}
+              protocol: TCP
+            {{- end }}
+          env:
+            - name: NACOS_SERVER
+              value: {{ $svc.env.NACOS_SERVER | default $.Values.config.nacos.serverAddr | default "nacos:8848" }}
+            - name: NACOS_NAMESPACE
+              value: {{ $svc.env.NACOS_NAMESPACE | default $.Values.config.nacos.namespace | default "public" }}
+            - name: NACOS_GROUP
+              value: {{ $svc.env.NACOS_GROUP | default $.Values.config.nacos.group | default "DEFAULT_GROUP" }}
+            - name: REDIS_HOST
+              value: {{ $svc.env.REDIS_HOST | default "redis-master" }}
+            - name: REDIS_PORT
+              value: {{ $svc.env.REDIS_PORT | default "6379" | quote }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ruoyi-nocode.fullname" $ }}-redis
+                  key: redis-password
+                  optional: true
+            - name: REDIS_DATABASE
+              value: {{ $svc.env.REDIS_DATABASE | default "0" | quote }}
+            {{- if $svc.env.DB_HOST }}
+            - name: DB_HOST
+              value: {{ $svc.env.DB_HOST }}
+            - name: DB_PORT
+              value: {{ $svc.env.DB_PORT | default "5432" | quote }}
+            - name: DB_NAME
+              value: {{ $svc.env.DB_NAME | default "cost" }}
+            - name: DB_USER
+              value: {{ $svc.env.DB_USER | default "ods" }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ruoyi-nocode.fullname" $ }}-postgresql
+                  key: password
+                  optional: true
+            {{- end }}
+            {{- if $svc.env.JWT_SECRET }}
+            - name: JWT_SECRET
+              value: {{ $svc.env.JWT_SECRET }}
+            - name: JWT_TTL
+              value: {{ $svc.env.JWT_TTL | default "7200000" | quote }}
+            {{- end }}
+            {{- if $svc.env.PF4J_ENABLED }}
+            - name: PF4J_ENABLED
+              value: {{ $svc.env.PF4J_ENABLED }}
+            {{- end }}
+            {{- range $k, $v := $svc.env }}
+            {{- if and (not (hasPrefix "DB_" $k)) (not (hasPrefix "REDIS_" $k)) (not (hasPrefix "JWT_" $k)) (not (hasPrefix "NACOS_" $k)) }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+            {{- end }}
+            - name: JAVA_OPTS
+              value: "-Xms{{ $svc.jvm.xms | default "256m" }} -Xmx{{ $svc.jvm.xmx | default "512m" }} -Xmn{{ $svc.jvm.xmn | default "128m" }}"
+          {{- with $svc.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 10 }}
+          {{- else }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ $.Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ $.Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ $.Values.probes.liveness.failureThreshold }}
+          {{- end }}
+          {{- with $svc.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 10 }}
+          {{- else }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: {{ $.Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ $.Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ $.Values.probes.readiness.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml $svc.resources | nindent 10 }}
+          volumeMounts:
+            {{- if $svc.persistence.enabled }}
+            - name: plugins
+              mountPath: /home/nocode-plugins
+            {{- end }}
+      volumes:
+        {{- if $svc.persistence.enabled }}
+        - name: plugins
+          persistentVolumeClaim:
+            claimName: {{ $name }}-plugins
+        {{- end }}
+  {{- with $svc.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- with $svc.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- with $svc.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 6 }}
+  {{- end }}
+{{- end }}
+
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "ruoyi-nocode.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+*/}}
+{{- define "ruoyi-nocode.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "ruoyi-nocode.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

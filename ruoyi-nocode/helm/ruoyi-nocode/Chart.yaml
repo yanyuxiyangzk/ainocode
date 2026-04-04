@@ -1,0 +1,38 @@
+apiVersion: v2
+name: ruoyi-nocode
+description: RuoYi NoCode Platform - Zero Code MicroService Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.24.0"
+keywords:
+  - ruoyi
+  - nocode
+  - microservices
+  - springcloud
+  - alibaba
+home: https://github.com/ruoyi-nocode
+sources:
+  - https://github.com/ruoyi-nocode
+maintainers:
+  - name: RuoYi Team
+    email: support@ruoyi.com
+    url: https://www.ruoyi.com
+
+dependencies:
+  - name: postgresql
+    version: 12.x.x
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 17.x.x
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+  - name: nacos
+    version: 1.x.x
+    repository: https://charts.bitnami.com
+    condition: nacos.enabled
+
+annotations:
+  category: ApplicationFramework
+  licenses: Apache-2.0

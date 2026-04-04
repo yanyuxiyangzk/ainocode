@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # Prometheus 监控
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: ruoyi-nocode-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - ruoyi-nocode-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Grafana 可视化面板
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: ruoyi-nocode-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: http://localhost:3000
+      GF_FEATURE_TOGGLES: "enableUploads"
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      - prometheus
+
+  # Loki 日志聚合
+  loki:
+    image: grafana/loki:2.8.0
+    container_name: ruoyi-nocode-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - ruoyi-nocode-network
+
+  # Promtail 日志收集器
+  promtail:
+    image: grafana/promtail:2.8.0
+    container_name: ruoyi-nocode-promtail
+    restart: unless-stopped
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - ruoyi-nocode-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Alertmanager 告警
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: ruoyi-nocode-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    networks:
+      - ruoyi-nocode-network
+
+networks:
+  ruoyi-nocode-network:
+    name: ruoyi-nocode-monitoring
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    name: ruoyi-nocode-prometheus-data
+  grafana_data:
+    name: ruoyi-nocode-grafana-data
+  loki_data:
+    name: ruoyi-nocode-loki-data
+  alertmanager_data:
+    name: ruoyi-nocode-alertmanager-data

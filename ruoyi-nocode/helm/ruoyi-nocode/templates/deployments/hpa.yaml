@@ -1,0 +1,142 @@
+{{- if .Values.gateway.autoscaling.enabled -}}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else -}}
+apiVersion: autoscaling/v1
+{{- end }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-gateway
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "ruoyi-nocode.fullname" . }}-gateway
+  minReplicas: {{ .Values.gateway.autoscaling.minReplicas | default 2 }}
+  maxReplicas: {{ .Values.gateway.autoscaling.maxReplicas | default 10 }}
+  metrics:
+    {{- if .Values.gateway.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.gateway.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else }}
+        targetCPUUtilizationPercentage: {{ .Values.gateway.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.gateway.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.gateway.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- else }}
+        targetMemoryUtilizationPercentage: {{ .Values.gateway.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+
+{{- if .Values.auth.autoscaling.enabled -}}
+---
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else -}}
+apiVersion: autoscaling/v1
+{{- end }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-auth
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-auth
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "ruoyi-nocode.fullname" . }}-auth
+  minReplicas: {{ .Values.auth.autoscaling.minReplicas | default 2 }}
+  maxReplicas: {{ .Values.auth.autoscaling.maxReplicas | default 10 }}
+  metrics:
+    {{- if .Values.auth.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.auth.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else }}
+        targetCPUUtilizationPercentage: {{ .Values.auth.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.auth.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.auth.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- else }}
+        targetMemoryUtilizationPercentage: {{ .Values.auth.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+
+{{- if .Values.system.autoscaling.enabled -}}
+---
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" -}}
+apiVersion: autoscaling/v2
+{{- else -}}
+apiVersion: autoscaling/v1
+{{- end }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ruoyi-nocode.fullname" . }}-system
+  namespace: {{ .Release.Namespace | default .Values.namespace }}
+  labels:
+    app: {{ include "ruoyi-nocode.fullname" . }}-system
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "ruoyi-nocode.fullname" . }}-system
+  minReplicas: {{ .Values.system.autoscaling.minReplicas | default 2 }}
+  maxReplicas: {{ .Values.system.autoscaling.maxReplicas | default 10 }}
+  metrics:
+    {{- if .Values.system.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.system.autoscaling.targetCPUUtilizationPercentage }}
+        {{- else }}
+        targetCPUUtilizationPercentage: {{ .Values.system.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.system.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.system.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- else }}
+        targetMemoryUtilizationPercentage: {{ .Values.system.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+{{- end }}

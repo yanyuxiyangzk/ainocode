@@ -1,0 +1,106 @@
+# RuoYi NoCode Gateway Service Configuration
+# Group: GATEWAY_GROUP
+# Environment: Development
+
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: ruoyi-nocode-auth
+          uri: lb://ruoyi-nocode-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: ruoyi-nocode-system
+          uri: lb://ruoyi-nocode-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@ipKeyResolver}"
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "GET,POST,PUT,DELETE,OPTIONS"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+
+# Sa-Token配置
+sa-token:
+  token-name: Authorization
+  timeout: 7200
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:ruoyi-nocode-secret-key-2026}
+  issuer: ${JWT_ISSUER:ruoyi-nocode}
+  subject: ${JWT_SUBJECT:auth}
+  ttl-millis: ${JWT_TTL:7200000}
+  refresh-tokens: ${JWT_REFRESH_TTL:604800000}
+
+# 网关安全配置
+gateway:
+  security:
+    ip-whitelist:
+      enabled: false
+      addresses:
+        - 127.0.0.1
+        - 192.168.0.0/16
+        - 10.0.0.0/8
+      excluded-paths:
+        - /auth/login
+        - /actuator/health
+    cors:
+      enabled: true
+      allowed-origin-patterns: "*"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
+    rate-limit:
+      enabled: true
+      global:
+        requests-per-second: 100
+        burst-capacity: 200
+      ip:
+        enabled: true
+        requests-per-second: 10
+        burst-capacity: 20
+      user:
+        enabled: true
+        requests-per-second: 50
+        burst-capacity: 100
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi.nocode: debug
+    org.springframework.cloud.gateway: info

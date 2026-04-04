@@ -1,0 +1,211 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 15 数据库
+  postgres:
+    image: postgres:15
+    container_name: ruoyi-nocode-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cost
+      POSTGRES_USER: ods
+      POSTGRES_PASSWORD: Test@123
+      TZ: Asia/Shanghai
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./../sql/init/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./../sql/seed:/docker-entrypoint-initdb.d/02-seed
+    networks:
+      - ruoyi-nocode-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ods -d cost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis 7 缓存
+  redis:
+    image: redis:7
+    container_name: ruoyi-nocode-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ruoyi-nocode-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Nacos 2.2.3 服务注册与配置中心
+  nacos:
+    image: nacos/nacos-server:v2.2.3
+    container_name: ruoyi-nocode-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: postgres
+      PREFER_HOST_MODE: hostname
+      NACOS_AUTH_ENABLE: false
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+      TZ: Asia/Shanghai
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos_data:/home/nacos/data
+      - nacos_logs:/home/nacos/logs
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # 网关服务
+  gateway:
+    build:
+      context: ../ruoyi-nocode-gateway
+      dockerfile: Dockerfile
+    container_name: ruoyi-nocode-gateway
+    restart: unless-stopped
+    environment:
+      NACOS_SERVER: nacos:8848
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-public}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DATABASE: 0
+      SENTINEL_DASHBOARD: sentinel:8858
+    ports:
+      - "8080:8080"
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # 认证服务
+  auth:
+    build:
+      context: ../ruoyi-nocode-auth
+      dockerfile: Dockerfile
+    container_name: ruoyi-nocode-auth
+    restart: unless-stopped
+    environment:
+      NACOS_SERVER: nacos:8848
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-public}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: cost
+      DB_USER: ods
+      DB_PASSWORD: Test@123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DATABASE: 0
+      JWT_SECRET: ruoyi-nocode-secret-key-2026
+      JWT_ISSUER: ruoyi-nocode
+      JWT_SUBJECT: auth
+      JWT_TTL: 7200000
+      PF4J_ENABLED: "true"
+    ports:
+      - "9201:9201"
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9201/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # 系统服务
+  system:
+    build:
+      context: ../ruoyi-nocode-system
+      dockerfile: Dockerfile
+    container_name: ruoyi-nocode-system
+    restart: unless-stopped
+    environment:
+      NACOS_SERVER: nacos:8848
+      NACOS_NAMESPACE: ${NACOS_NAMESPACE:-public}
+      NACOS_GROUP: ${NACOS_GROUP:-DEFAULT_GROUP}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: cost
+      DB_USER: ods
+      DB_PASSWORD: Test@123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DATABASE: 0
+      JWT_SECRET: ruoyi-nocode-secret-key-2026
+      JWT_ISSUER: ruoyi-nocode
+      JWT_SUBJECT: auth
+      JWT_TTL: 7200000
+      PF4J_ENABLED: "true"
+    ports:
+      - "9200:9200"
+    networks:
+      - ruoyi-nocode-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  ruoyi-nocode-network:
+    driver: bridge
+    name: ruoyi-nocode-network
+
+volumes:
+  postgres_data:
+    name: ruoyi-nocode-postgres-data
+  redis_data:
+    name: ruoyi-nocode-redis-data
+  nacos_data:
+    name: ruoyi-nocode-nacos-data
+  nacos_logs:
+    name: ruoyi-nocode-nacos-logs

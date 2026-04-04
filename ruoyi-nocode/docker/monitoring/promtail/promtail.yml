@@ -1,0 +1,31 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # 收集 Spring Boot 应用日志
+  - job_name: spring-boot-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: spring-boot
+          __path__: /var/log/**/*.log
+
+  # 收集 Docker 日志
+  - job_name: docker-logs
+    docker_targets:
+      - host: "unix:///var/run/docker.sock"
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: container_name
+      - source_labels: ['__meta_docker_container_label_service']
+        regex: '(.*)'
+        target_label: service
