@@ -356,13 +356,13 @@ public class VueIndexGenerator extends BaseCodeGenerator {
                     if (valid) {
                       if (form.value.$pkFieldName) {
                         update${table.entityName}(form.value).then(response => {
-                          proxy.\$modal.msgSuccess('修改成功')
+                          proxy.\\$modal.msgSuccess('修改成功')
                           dialogVisible.value = false
                           getList()
                         })
                       } else {
                         add${table.entityName}(form.value).then(response => {
-                          proxy.\$modal.msgSuccess('新增成功')
+                          proxy.\\$modal.msgSuccess('新增成功')
                           dialogVisible.value = false
                           getList()
                         })
@@ -374,17 +374,17 @@ public class VueIndexGenerator extends BaseCodeGenerator {
                 /** 删除按钮操作 */
                 function handleDelete(row) {
                   const $pkJsFieldName = row.$pkFieldName || ids.value
-                  proxy.\$modal.confirm('是否确认删除编号为"' + $pkJsFieldName + '"的数据项？')
+                  proxy.\\$modal.confirm('是否确认删除编号为"' + $pkJsFieldName + '"的数据项？')
                     .then(() => del${table.entityName}($pkJsFieldName))
                     .then(() => {
                       getList()
-                      proxy.\$modal.msgSuccess('删除成功')
+                      proxy.\\$modal.msgSuccess('删除成功')
                     })
                 }
 
                 /** 导出按钮操作 */
                 function handleExport() {
-                  proxy.\$modal.confirm('是否确认导出所有数据项？')
+                  proxy.\\$modal.confirm('是否确认导出所有数据项？')
                     .then(() => {
                       // exportExcel(queryParams)
                     })

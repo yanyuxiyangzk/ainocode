@@ -2,6 +2,7 @@ package com.ruoyi.nocode.common.core.sandbox;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
