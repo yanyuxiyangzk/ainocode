@@ -254,14 +254,47 @@ class PipelineRunner:
         return False, "No multi-role team found - must create team with 3+ roles"
 
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
-        """执行质量检查"""
+        """执行质量检查（集成 quality_gate.py）"""
         pipeline_dir = self.pipelines_dir / pipeline_id
         project_dir = AUTO_DEV_BASE.parent  # 假设项目在parent目录
 
         print(f"\n[QUALITY CHECK] Stage: {stage}")
         print("=" * 60)
 
-        # 导入rule_guard
+        # 优先使用新的 quality_gate.py
+        quality_gate_script = SCRIPTS_DIR / "quality_gate.py"
+
+        if quality_gate_script.exists():
+            try:
+                # 调用 quality_gate.py
+                if stage == "development":
+                    # 开发阶段：完整质量门禁（跳过测试，测试在testing阶段）
+                    cmd = [sys.executable, str(quality_gate_script),
+                           "--project-root", str(project_dir),
+                           "--skip-test"]
+                elif stage == "testing":
+                    # 测试阶段：完整质量门禁
+                    cmd = [sys.executable, str(quality_gate_script),
+                           "--project-root", str(project_dir)]
+                else:
+                    return True, "No quality check required"
+
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+                success = result.returncode == 0
+
+                if result.stdout:
+                    print(result.stdout)
+                if result.stderr:
+                    print(result.stderr, file=sys.stderr)
+
+                return success, "Quality gate passed" if success else "Quality gate failed"
+
+            except subprocess.TimeoutExpired:
+                return False, "Quality gate timeout (>600s)"
+            except Exception as e:
+                print(f"[WARN] quality_gate.py error: {e}, falling back to rule_guard")
+
+        # 回退到 rule_guard
         sys.path.insert(0, str(SCRIPTS_DIR))
         try:
             from rule_guard import RuleGuard
@@ -299,6 +332,47 @@ class PipelineRunner:
             return test_ok, test_msg
 
         return True, "No quality check required"
+
+    def run_reviewer(self, pipeline_id: str, iteration: int = 1) -> Tuple[bool, str]:
+        """执行代码审核（集成 reviewer.py）"""
+        project_dir = AUTO_DEV_BASE.parent
+
+        print(f"\n[REVIEWER] Code Review - Iteration {iteration}")
+        print("=" * 60)
+
+        reviewer_script = SCRIPTS_DIR / "reviewer.py"
+
+        if not reviewer_script.exists():
+            print("[WARN] reviewer.py not found, skipping code review")
+            return True, "Reviewer skipped (script not available)"
+
+        try:
+            cmd = [sys.executable, str(reviewer_script),
+                   "--project-root", str(project_dir),
+                   "--iteration", str(iteration),
+                   "--json", str(self.pipelines_dir / pipeline_id / f"review-iteration-{iteration}.json")]
+
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+            success = result.returncode == 0
+
+            if result.stdout:
+                print(result.stdout)
+            if result.stderr:
+                print(result.stderr, file=sys.stderr)
+
+            # 解析审核结果
+            if result.returncode == 0:
+                return True, "Reviewer APPROVED"
+            elif result.returncode == 2:
+                return False, "Reviewer REJECTED (max iterations reached)"
+            else:
+                return False, "Reviewer REVISION_REQUESTED"
+
+        except subprocess.TimeoutExpired:
+            return False, "Reviewer timeout (>600s)"
+        except Exception as e:
+            print(f"[WARN] reviewer.py error: {e}")
+            return True, f"Reviewer error: {e}"
 
     def run_stage(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """运行单个阶段"""
@@ -392,6 +466,12 @@ python scripts/team_launcher.py launch-all {pipeline_id}
         print(f"[INFO] Run: chmod +x {script_file} && ./{script_file}")
 
         # 注意：实际启动需要Claude Code CLI支持
+        # 开发完成后会自动触发 Reviewer 审核
+        print(f"\n[INFO] After development, pipeline will automatically trigger:")
+        print(f"       1. quality_gate.py (quality gate)")
+        print(f"       2. reviewer.py (code review)")
+        print(f"       3. Iterations if REVISION_REQUESTED (max 3)")
+
         return True, f"Development team ready. Run launch script to start parallel development."
 
     def run_testing_stage(self, pipeline_id: str) -> Tuple[bool, str]:
@@ -456,6 +536,37 @@ python scripts/team_launcher.py launch-all {pipeline_id}
                     print(f"\n[FAIL] Quality gate failed: {gate_msg}")
                     results["stages"][stage]["success"] = False
                     break
+
+                # 开发阶段后进行代码审核（Reviewer）
+                if stage == "development":
+                    print(f"\n[REVIEWER] Starting code review process...")
+                    reviewer_iteration = 1
+                    max_reviewer_iterations = 3
+                    reviewer_approved = False
+
+                    while reviewer_iteration <= max_reviewer_iterations:
+                        reviewer_ok, reviewer_msg = self.run_reviewer(pipeline_id, reviewer_iteration)
+                        results["stages"][stage][f"reviewer_iteration_{reviewer_iteration}"] = reviewer_msg
+
+                        if reviewer_ok:
+                            print(f"\n[REVIEWER] ✓ APPROVED at iteration {reviewer_iteration}")
+                            reviewer_approved = True
+                            break
+                        elif "REJECTED" in reviewer_msg:
+                            print(f"\n[REVIEWER] ✗ REJECTED - max iterations reached")
+                            results["stages"][stage]["success"] = False
+                            results["stages"][stage]["reviewer_result"] = "REJECTED"
+                            break
+                        else:
+                            print(f"\n[REVIEWER] ⚠ REVISION_REQUESTED - iteration {reviewer_iteration}")
+                            print(f"[REVIEWER] Waiting for code fixes...")
+                            reviewer_iteration += 1
+
+                    if reviewer_approved:
+                        results["stages"][stage]["reviewer_result"] = "APPROVED"
+                        print(f"[REVIEWER] Code review passed!")
+                    elif not results["stages"][stage].get("reviewer_result"):
+                        results["stages"][stage]["reviewer_result"] = "SKIPPED"
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))

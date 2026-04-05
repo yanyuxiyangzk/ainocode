@@ -7,19 +7,33 @@
 
 ## 🚀 激活关键词
 
-**当用户说以下任意关键词时，立即执行完整自动化开发流程：**
+**当用户说以下任意关键词时，立即执行对应操作：**
 
-| 关键词 | 说明 |
+### 启动类
+| 关键词 | 动作 |
 |--------|------|
-| `开始自动化开发` | 启动完整自动化开发流程 |
-| `自动化开发` | 启动完整自动化开发流程 |
-| `开始开发` | 启动完整自动化开发流程 |
-| `auto-dev` | 启动完整自动化开发流程 |
-| `开始8小时开发` | 启动8小时完整开发 |
+| `开始自动化开发` / `自动开发 XXX` | 一键启动完整自动化开发 |
+| `继续开发` | 从 checkpoint 恢复并继续 |
+| `部署` | 执行部署阶段 |
+
+### 检查类
+| 关键词 | 动作 |
+|--------|------|
+| `检查状态` / `查看进度` | 查看流水线状态 |
+| `质量检查` | 执行 quality_gate.py |
+| `代码审核` | 执行 reviewer.py |
+| `运行测试` | 执行测试验证 |
+| `健康检查` | 系统健康检查 |
+
+### 工具类
+| 关键词 | 动作 |
+|--------|------|
+| `安装钩子` | 安装 Git Hooks |
+| `启动监控` | 启动心跳守护 |
 
 ---
 
-## ⚠️ 核心禁令（违反者将被Guardian封锁）
+## ⚠️ 核心禁令
 
 ```
 1. 【严禁】直接写代码 — 必须委托给Agent团队
@@ -32,147 +46,145 @@
 8. 【必须】执行 mvn test 单元测试
 ```
 
-### 环境配置
-- Maven: `D:/tools/apache-maven-3.9.9/bin/mvn.cmd`
-- JDK17: `D:/Program Files/Java/jdk-17.0.6`
-- 编译命令: `JAVA_HOME="D:/Program Files/Java/jdk-17.0.6" D:/tools/apache-maven-3.9.9/bin/mvn.cmd compile`
-- 测试命令: `JAVA_HOME="D:/Program Files/Java/jdk-17.0.6" D:/tools/apache-maven-3.9.9/bin/mvn.cmd test`
+---
+
+## 🎯 一键启动（推荐）
+
+当用户说 **`自动开发 XXX`** 时，执行：
+
+```bash
+cd d:/project/aicoding/item/ainocode/auto-dev
+python scripts/start_dev.py auto "XXX需求"
+```
+
+**start_dev.py 会自动执行：**
+1. 初始化流水线
+2. 调用 `agent_spawner.py spawn-team dev-team` 创建开发团队
+3. Agent团队通过 Claude Code CLI 自动启动
+4. 运行流水线
+5. 执行质量门禁
+6. 执行代码审核
+7. 保存 checkpoint
+8. 启动心跳守护
+
+### TeamCreate 自动触发
+
+使用 `agent_spawner.py` 自动触发 TeamCreate：
+
+```bash
+# 启动完整团队（后端+前端+测试）
+python scripts/agent_spawner.py spawn-team dev-team
+
+# 启动完整团队（含架构师+DevOps）
+python scripts/agent_spawner.py spawn-team full-team
+
+# 启动单个Agent
+python scripts/agent_spawner.py spawn backend-dev
+
+# 列出所有运行中的Agent
+python scripts/agent_spawner.py list
+
+# 停止指定Agent
+python scripts/agent_spawner.py kill backend-dev-103045
+```
+
+**团队配置（teams-config.json）：**
+| 团队 | Agent |
+|------|-------|
+| dev-team | backend-dev, frontend-dev, tester |
+| full-team | backend-dev, frontend-dev, tester, devops, architect |
 
 ---
 
-## 🎯 自动化开发流程（自动执行）
+## 📋 可用命令
 
-当收到激活关键词时，**立即按顺序执行以下步骤**，无需询问用户：
-
-### 步骤1：初始化流水线
-```bash
-cd d:/project/aicoding/item/ainocode/auto-dev
-python scripts/pipeline_runner.py init "<从用户输入提取的需求描述>"
-```
-
-### 步骤2：创建团队（使用TeamCreate）
-```bash
-# 在.claude/teams/创建团队配置
-# 团队必须包含至少3个角色：backend-dev, frontend-dev, tester
-```
-
-**TeamCreate 创建团队命令：**
-```
-TeamCreate
-{
-  "team_name": "dev-team-<pipeline_id>",
-  "description": "自动化开发团队",
-  "agent_type": "orchestrator"
-}
-```
-
-### 步骤3：并行启动Agent（使用Agent工具spawn）
-
-**同时spawn以下Agent（全部并行）：**
-
-| Agent | 角色 | 任务 |
-|-------|------|------|
-| `backend-dev-1` | 后端开发 | 并行开发后端代码 |
-| `frontend-dev-1` | 前端开发 | 并行开发前端代码 |
-| `tester-1` | 测试工程师 | 准备测试用例 |
-
-**spawn命令示例：**
-```
-Agent
-{
-  "description": "后端开发Agent",
-  "prompt": "你是后端开发工程师，使用auto-dev规则开发...",
-  "subagent_type": "general-purpose",
-  "name": "backend-dev-1",
-  "team_name": "dev-team-<pipeline_id>"
-}
-```
-
-### 步骤4：执行Guardian检查
-```bash
-cd d:/project/aicoding/item/ainocode/auto-dev
-python scripts/guardian_agent.py pre-write <项目目录>
-python scripts/rule_guard.py gate development <项目目录>
-```
-
-### 步骤5：监控并行开发
-- 定期检查 `python scripts/rule_guard.py check <目录>`
-- 记录违规到 `auto-dev/self-improving/memory.md`
-- 发现P0违规立即停止相关Agent
-
-### 步骤6：测试验证
-```bash
-python scripts/rule_guard.py gate testing <项目目录>
-```
-
-### 步骤7：质量门卫
-```bash
-python scripts/rule_guard.py pre-commit <项目目录>
-```
-
----
-
-## 核心能力
-
-| 功能 | 命令 |
+| 命令 | 说明 |
 |------|------|
-| **初始化流水线** | `python scripts/pipeline_runner.py init <需求>` |
-| **创建团队** | TeamCreate 创建多角色团队 |
-| **并行启动** | Agent spawn 并行执行 |
-| **质量门卫** | `python scripts/rule_guard.py gate <stage> <path>` |
-| **提交检查** | `python scripts/rule_guard.py pre-commit <path>` |
-| **Guardian检查** | `python scripts/guardian_agent.py team-check` |
-| **状态监控** | `python scripts/orchestrator_ops.py monitor <pipeline_id>` |
+| `python start_dev.py auto "需求"` | 启动自动开发 |
+| `python start_dev.py continue` | 从检查点继续 |
+| `python start_dev.py status` | 查看状态 |
+| `python start_dev.py quality` | 质量门禁 |
+| `python start_dev.py review` | 代码审核 |
+| `python start_dev.py heartbeat` | 启动心跳 |
+| `python start_dev.py install-hook` | 安装Git Hooks |
+| `python start_dev.py check` | 系统检查 |
 
 ---
 
-## 并行规则
+## 🔄 完整流水线
 
-| 阶段 | 可并行 | 说明 |
-|------|--------|------|
-| 需求分析 | ❌ | 必须在前 |
-| 技术设计 | ❌ | 必须等需求 |
-| 后端开发 | ✅ | 可与前端并行 |
-| 前端开发 | ✅ | 可与后端并行 |
-| 测试验证 | ❌ | 必须等开发 |
-| 上线部署 | ❌ | 必须等测试 |
+```
+requirement (需求分析)
+       ↓
+design (架构设计)
+       ↓
+development (开发实现)
+       ├→ agent_spawner.py spawn-team (创建Agent团队)
+       ├→ quality_gate.py (编译+测试+安全)
+       ├→ reviewer.py (代码审核, 最多3次)
+       └→ team_launcher.py (启动Agent)
+       ↓
+testing (测试验证)
+       ↓
+deployment (部署上线)
+       ↓
+auto_heartbeat.py (持续监控)
+```
 
 ---
 
-## 异常等级
+## 🛡️ 规则守卫
 
-| 等级 | 说明 | 处理方式 |
+| 组件 | 功能 |
+|------|------|
+| `rule_guard.py` | Stuck检测、SelfHeal自愈 |
+| `guardian_agent.py` | 规则守护、P0封锁 |
+| `checkpoint_ops.py` | 断点保存/恢复 |
+
+---
+
+## 📊 异常等级
+
+| 等级 | 说明 | 处理 |
 |------|------|------|
-| P0 | 阻塞整个流水线 | 立即停止，报告PM |
-| P1 | 影响某个阶段 | 标记阻塞，尝试协调 |
-| P2 | 不影响流程 | 记录，继续执行 |
+| P0 | 安全违规、删除核心 | 立即停止 |
+| P1 | 编译失败、测试失败 | 阻止通过 |
+| P2 | 命名不规范 | 警告 |
 
 ---
 
-## 阶段超时(小时)
+## 🔔 24/7 无人值守
 
-| 阶段 | 超时 |
-|------|------|
-| 需求分析 | 2h |
-| 技术设计 | 4h |
-| 开发实现 | 8h |
-| 测试验证 | 4h |
-| 上线部署 | 2h |
-
----
-
-## 自动学习触发
-
-协调过程中自动记录学习：
+启动心跳守护后自动：
+- 每 10 分钟心跳检查
+- 每小时自动质量门禁
+- 每小时自动保存检查点
+- 检测到阻塞自动通知
 
 ```bash
-# 检测到异常后
-python scripts/auto_learn_hook.py learn "<异常描述>" --type technical --context "orchestrator异常处理"
-
-# 阶段推进后
-python scripts/auto_reflect_hook.py trigger <pipeline_id> <stage>
+python start_dev.py heartbeat
 ```
 
 ---
 
-最后更新：2026-04-03
+## 配置
+
+在 `.auto-dev.yaml` 中配置：
+
+```yaml
+# 通知配置（可选）
+notification:
+  enabled: false
+  webhook_url: "https://discord.com/api/webhooks/..."
+
+# 时间窗口（可选）
+time_window:
+  enabled: false
+  work_hours:
+    start: "09:00"
+    end: "22:00"
+```
+
+---
+
+最后更新：2026-04-05

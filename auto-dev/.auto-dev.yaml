@@ -1,0 +1,199 @@
+# Auto-Dev 配置文件
+# 版本：1.0
+# 说明：任何项目都可以在根目录放置此配置文件，auto-dev脚本将自动读取
+
+version: "1.0"
+
+# ============================================================
+# 项目类型 (必填)
+# 支持: maven | gradle | npm | pnpm | go | cargo | python
+# ============================================================
+project_type: "maven"
+
+# ============================================================
+# 项目信息 (可选)
+# ============================================================
+project:
+  name: "auto-dev-project"
+  root: "."  # 项目根目录，. 表示当前目录
+
+# ============================================================
+# 编译命令配置
+# ============================================================
+compile:
+  # 编译命令 (必填)
+  command: "mvn clean compile"
+  # 超时时间(秒) (默认300秒)
+  timeout: 300
+  # 失败是否block (默认true)
+  block_on_fail: true
+  # 环境变量 (可选)
+  env:
+    JAVA_HOME: "D:/Program Files/Java/jdk-17.0.6"
+    MAVEN_OPTS: "--add-opens java.base/java.lang=ALL-UNNAMED"
+
+# ============================================================
+# 测试命令配置
+# ============================================================
+test:
+  # 测试命令 (必填)
+  command: "mvn test"
+  # 超时时间(秒) (默认600秒)
+  timeout: 600
+  # 覆盖率阈值 (默认70%)
+  coverage_threshold: 70
+  # 失败是否block (默认true)
+  block_on_fail: true
+  # 忽略测试失败的文件/目录 (可选)
+  exclude:
+    - "**/target/**"
+    - "**/node_modules/**"
+
+# ============================================================
+# 安全扫描配置
+# ============================================================
+security:
+  # 是否启用安全扫描 (默认true)
+  enabled: true
+  # 扫描工具列表 (可多选)
+  tools:
+    # Maven依赖分析
+    - name: "dependency-analyze"
+      command: "mvn dependency:analyze"
+      # 发现严重级别问题的处理方式
+      # block = 阻止通过 | warn = 仅警告 | ignore = 忽略
+      on_fail: "warn"
+    # 禁止的依赖检查
+    - name: "forbidden-deps"
+      command: "mvn dependency:tree"
+      pattern: "^(com.nocode|nocode-api)"
+      # 禁止使用但项目内部使用的依赖
+      allow_internal: true
+  # 自定义安全规则 (可选)
+  custom_rules:
+    # 检测硬编码密码
+    - id: "hardcoded-secret"
+      pattern: '(password|secret|token|api_key)\\s*=\\s*["\'][^"\']{3,}["\']'
+      severity: "P0"
+      message: "发现硬编码密钥，禁止提交"
+
+# ============================================================
+# 代码风格检查
+# ============================================================
+code_style:
+  # 是否启用 (默认true)
+  enabled: true
+  # 检查命令
+  check_command: "mvn checkstyle:check"
+  # 格式化命令 (可选)
+  format_command: "mvn spotless:apply"
+  # 失败是否block (默认false，仅警告)
+  block_on_fail: false
+
+# ============================================================
+# 门禁规则配置
+# ============================================================
+gate:
+  # 阻塞规则 - 满足任意一项即阻止通过
+  block_on:
+    compile_fail: true      # 编译失败
+    test_fail: true        # 测试失败
+    p0_security: true      # P0级别安全问题
+    forbidden_action: true  # 禁止操作(如删除.git)
+
+  # 警告规则 - 满足任意一项仅警告，不阻止
+  warn_on:
+    coverage_low: true     # 覆盖率低于阈值
+    checkstyle_fail: true  # 代码格式问题
+    p1_security: true     # P1级别安全问题
+
+# ============================================================
+# Reviewer配置
+# ============================================================
+reviewer:
+  # 是否启用 (默认true)
+  enabled: true
+  # 最大迭代次数 (默认3次)
+  max_iterations: 3
+  # 必须通过的审核次数 (默认1次)
+  required_approvals: 1
+  # 审核标准
+  standards:
+    compile_success: true      # 编译必须成功
+    test_pass_rate: 90         # 测试通过率最低90%
+    no_p0_security: true        # 禁止P0安全问题
+    no_p1_security: false       # P1问题仅警告
+    no_hardcoded_secrets: true # 禁止硬编码密钥
+    naming_convention: true     # 必须符合命名规范
+    javadoc_required: false    # 公共类需要Javadoc(可选)
+
+# ============================================================
+# Git Hooks配置
+# ============================================================
+git_hooks:
+  # 是否自动安装 (默认true)
+  auto_install: true
+  # pre-commit钩子
+  pre_commit:
+    enabled: true
+    # 执行的检查项 (按顺序)
+    checks:
+      - "quality_gate"    # 质量门禁(编译+测试)
+      - "security_scan"  # 安全扫描
+      - "forbidden_check" # 禁止操作检查
+    # 失败时是否阻止提交 (默认true)
+    block_on_fail: true
+
+# ============================================================
+# 通知配置 (可选)
+# ============================================================
+notification:
+  # 是否启用通知 (默认false)
+  enabled: false
+  # 通知方式
+  channels:
+    # Discord webhook (可选)
+    # discord:
+    #   webhook_url: "https://discord.com/api/webhooks/..."
+    # 邮件通知 (可选)
+    # email:
+    #   smtp_server: "smtp.example.com"
+    #   from: "auto-dev@example.com"
+  # 通知事件
+  events:
+    - "gate_pass"      # 门禁通过
+    - "gate_fail"     # 门禁失败
+    - "review_approved"  # 审核通过
+    - "review_rejected"  # 审核拒绝
+
+# ============================================================
+# 阶段超时配置
+# ============================================================
+stage_timeout:
+  requirement: 7200     # 需求分析阶段(秒) = 2小时
+  design: 14400        # 技术设计阶段(秒) = 4小时
+  development: 28800    # 开发实现阶段(秒) = 8小时
+  testing: 14400       # 测试验证阶段(秒) = 4小时
+  deployment: 7200      # 上线部署阶段(秒) = 2小时
+
+# ============================================================
+# 限流保护配置
+# ============================================================
+rate_limit:
+  # 单任务最大Token消耗
+  max_tokens_per_task: 150000
+  # 单任务最大执行时间(秒) = 30分钟
+  max_task_duration: 1800
+  # 连续失败任务数达到此值时停止
+  max_consecutive_failures: 3
+
+# ============================================================
+# 持久化配置 (用于任务恢复)
+# ============================================================
+persistence:
+  # 是否启用断点恢复 (默认true)
+  enabled: true
+  # 状态文件目录
+  state_dir: ".auto-dev/state"
+  # 检查点保存间隔(秒)
+  checkpoint_interval: 600

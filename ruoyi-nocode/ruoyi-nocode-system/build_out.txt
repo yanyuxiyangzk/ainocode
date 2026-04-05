@@ -1,0 +1,662 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.ruoyi:ruoyi-nocode-system >--------------------
+[INFO] Building ruoyi-nocode-system 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ ruoyi-nocode-system ---
+[INFO] Deleting D:\project\aicoding\item\ainocode\ruoyi-nocode\ruoyi-nocode-system\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ruoyi-nocode-system ---
+[INFO] Copying 26 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.12.1:compile (default-compile) @ ruoyi-nocode-system ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 127 source files with javac [debug target 17] to target\classes
+[INFO] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysDictDataServiceImpl.java: 某些输入文件使用或覆盖了已过时的 API。
+[INFO] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysDictDataServiceImpl.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] 某些消息已经过简化; 请使用 -Xdiags:verbose 重新编译以获得完整输出
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[262,9] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[262,57] java.lang.System 中的 getSecurityManager() 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[267,17] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[268,23] java.lang.System 中的 setSecurityManager(java.lang.SecurityManager) 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[283,19] java.lang.System 中的 setSecurityManager(java.lang.SecurityManager) 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[361,20] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[INFO] 7 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysLogininfor.java:[17,36] 此处不需要接口
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysOperLog.java:[17,33] 此处不需要接口
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysDictType.java:[15,34] 找不到符号
+  符号: 类 BaseEntity
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[104,20] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[105,20] 找不到符号
+  符号:   方法 setEnabled(boolean)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[106,20] 找不到符号
+  符号:   方法 setCodeVersion(int)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[107,20] 找不到符号
+  符号:   方法 setExecuteCount(long)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[130,20] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[131,20] 找不到符号
+  符号:   方法 setCompiledBytes(<nulltype>)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[165,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[185,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[203,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[230,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[245,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[260,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[279,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[40,24] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[40,62] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[41,63] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[41,26] 方法引用无效
+  找不到符号
+    符号:   方法 getCodeCode()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[43,24] 找不到符号
+  符号:   方法 getCodeName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[43,62] 找不到符号
+  符号:   方法 getCodeName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[44,63] 找不到符号
+  符号:   方法 getCodeName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[44,26] 方法引用无效
+  找不到符号
+    符号:   方法 getCodeName()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[46,24] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[46,63] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[47,64] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[47,26] 方法引用无效
+  找不到符号
+    符号:   方法 getClassName()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[49,24] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[49,60] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[50,59] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[50,24] 方法引用无效
+  找不到符号
+    符号:   方法 getStatus()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[52,24] 找不到符号
+  符号:   方法 getCodeType()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[52,62] 找不到符号
+  符号:   方法 getCodeType()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[53,61] 找不到符号
+  符号:   方法 getCodeType()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[53,24] 方法引用无效
+  找不到符号
+    符号:   方法 getCodeType()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[55,24] 找不到符号
+  符号:   方法 getEnabled()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[56,60] 找不到符号
+  符号:   方法 getEnabled()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[56,24] 方法引用无效
+  找不到符号
+    符号:   方法 getEnabled()
+    位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[81,34] 找不到符号
+  符号:   方法 getCodeId()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[83,28] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[89,34] 找不到符号
+  符号:   方法 getCodeId()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[91,28] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[123,41] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 code
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[127,37] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 code
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[141,45] 找不到符号
+  符号:   方法 getEnabled()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[142,63] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[149,69] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[186,60] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[195,20] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[196,20] 找不到符号
+  符号:   方法 setEnabled(boolean)
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[200,43] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[211,45] 找不到符号
+  符号:   方法 getEnabled()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[212,63] 找不到符号
+  符号:   方法 getCodeCode()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[215,61] 找不到符号
+  符号:   方法 getClassName()
+  位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[34,36] 找不到符号
+  符号:   方法 getUserName()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[35,52] 找不到符号
+  符号:   方法 getUserName()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[35,26] 方法引用无效
+  找不到符号
+    符号:   方法 getUserName()
+    位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[37,36] 找不到符号
+  符号:   方法 getNickName()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[38,52] 找不到符号
+  符号:   方法 getNickName()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[38,26] 方法引用无效
+  找不到符号
+    符号:   方法 getNickName()
+    位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[40,36] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[41,48] 找不到符号
+  符号:   方法 getStatus()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[41,24] 方法引用无效
+  找不到符号
+    符号:   方法 getStatus()
+    位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[43,36] 找不到符号
+  符号:   方法 getPhonenumber()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[44,55] 找不到符号
+  符号:   方法 getPhonenumber()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[44,26] 方法引用无效
+  找不到符号
+    符号:   方法 getPhonenumber()
+    位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[46,17] 找不到符号
+  符号:   方法 getDeptId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[47,48] 找不到符号
+  符号:   方法 getDeptId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[47,24] 方法引用无效
+  找不到符号
+    符号:   方法 getDeptId()
+    位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[82,17] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[82,46] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[83,32] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[83,50] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[85,17] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[85,46] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[86,32] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[86,50] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[95,17] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[95,46] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[96,55] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[97,32] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[97,50] 找不到符号
+  符号:   方法 getRoleIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[99,17] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[99,46] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[100,55] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[101,32] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[101,50] 找不到符号
+  符号:   方法 getPostIds()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[110,13] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[125,13] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[126,13] 找不到符号
+  符号:   方法 setPassword(java.lang.String)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[133,13] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[134,13] 找不到符号
+  符号:   方法 setStatus(java.lang.String)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[143,21] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUserRole的变量 userRole
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[144,21] 找不到符号
+  符号:   方法 setRoleId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUserRole的变量 userRole
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[158,21] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUserPost的变量 userPost
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[159,21] 找不到符号
+  符号:   方法 setPostId(java.lang.Long)
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUserPost的变量 userPost
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[173,65] 找不到符号
+  符号:   方法 getPhonenumber()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[177,22] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 dbUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[177,46] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.366 s
+[INFO] Finished at: 2026-04-04T20:45:51+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile (default-compile) on project ruoyi-nocode-system: Compilation failure: Compilation failure: 
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysLogininfor.java:[17,36] 此处不需要接口
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysOperLog.java:[17,33] 此处不需要接口
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/entity/SysDictType.java:[15,34] 找不到符号
+[ERROR]   符号: 类 BaseEntity
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[104,20] 找不到符号
+[ERROR]   符号:   方法 setStatus(java.lang.String)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[105,20] 找不到符号
+[ERROR]   符号:   方法 setEnabled(boolean)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[106,20] 找不到符号
+[ERROR]   符号:   方法 setCodeVersion(int)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[107,20] 找不到符号
+[ERROR]   符号:   方法 setExecuteCount(long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[130,20] 找不到符号
+[ERROR]   符号:   方法 setStatus(java.lang.String)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[131,20] 找不到符号
+[ERROR]   符号:   方法 setCompiledBytes(<nulltype>)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[165,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[185,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[203,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[230,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[245,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[260,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/controller/DynamicCodeController.java:[279,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.ruoyi.nocode.system.controller.DynamicCodeController
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[40,24] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[40,62] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[41,63] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[41,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getCodeCode()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[43,24] 找不到符号
+[ERROR]   符号:   方法 getCodeName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[43,62] 找不到符号
+[ERROR]   符号:   方法 getCodeName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[44,63] 找不到符号
+[ERROR]   符号:   方法 getCodeName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[44,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getCodeName()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[46,24] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[46,63] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[47,64] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[47,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getClassName()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[49,24] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[49,60] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[50,59] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[50,24] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getStatus()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[52,24] 找不到符号
+[ERROR]   符号:   方法 getCodeType()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[52,62] 找不到符号
+[ERROR]   符号:   方法 getCodeType()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[53,61] 找不到符号
+[ERROR]   符号:   方法 getCodeType()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[53,24] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getCodeType()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[55,24] 找不到符号
+[ERROR]   符号:   方法 getEnabled()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[56,60] 找不到符号
+[ERROR]   符号:   方法 getEnabled()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[56,24] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getEnabled()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.DynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[81,34] 找不到符号
+[ERROR]   符号:   方法 getCodeId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[83,28] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[89,34] 找不到符号
+[ERROR]   符号:   方法 getCodeId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[91,28] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[123,41] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 code
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[127,37] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 code
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[141,45] 找不到符号
+[ERROR]   符号:   方法 getEnabled()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[142,63] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[149,69] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[186,60] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[195,20] 找不到符号
+[ERROR]   符号:   方法 setStatus(java.lang.String)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[196,20] 找不到符号
+[ERROR]   符号:   方法 setEnabled(boolean)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[200,43] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[211,45] 找不到符号
+[ERROR]   符号:   方法 getEnabled()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[212,63] 找不到符号
+[ERROR]   符号:   方法 getCodeCode()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/DynamicCodeServiceImpl.java:[215,61] 找不到符号
+[ERROR]   符号:   方法 getClassName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.DynamicCode的变量 dynamicCode
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[34,36] 找不到符号
+[ERROR]   符号:   方法 getUserName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[35,52] 找不到符号
+[ERROR]   符号:   方法 getUserName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[35,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getUserName()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[37,36] 找不到符号
+[ERROR]   符号:   方法 getNickName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[38,52] 找不到符号
+[ERROR]   符号:   方法 getNickName()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[38,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getNickName()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[40,36] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[41,48] 找不到符号
+[ERROR]   符号:   方法 getStatus()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[41,24] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getStatus()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[43,36] 找不到符号
+[ERROR]   符号:   方法 getPhonenumber()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[44,55] 找不到符号
+[ERROR]   符号:   方法 getPhonenumber()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[44,26] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getPhonenumber()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[46,17] 找不到符号
+[ERROR]   符号:   方法 getDeptId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[47,48] 找不到符号
+[ERROR]   符号:   方法 getDeptId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[47,24] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getDeptId()
+[ERROR]     位置: 类 com.ruoyi.nocode.system.entity.SysUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[82,17] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[82,46] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[83,32] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[83,50] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[85,17] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[85,46] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[86,32] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[86,50] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[95,17] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[95,46] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[96,55] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[97,32] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[97,50] 找不到符号
+[ERROR]   符号:   方法 getRoleIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[99,17] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[99,46] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[100,55] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[101,32] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[101,50] 找不到符号
+[ERROR]   符号:   方法 getPostIds()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[110,13] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[125,13] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[126,13] 找不到符号
+[ERROR]   符号:   方法 setPassword(java.lang.String)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[133,13] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[134,13] 找不到符号
+[ERROR]   符号:   方法 setStatus(java.lang.String)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[143,21] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUserRole的变量 userRole
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[144,21] 找不到符号
+[ERROR]   符号:   方法 setRoleId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUserRole的变量 userRole
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[158,21] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUserPost的变量 userPost
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[159,21] 找不到符号
+[ERROR]   符号:   方法 setPostId(java.lang.Long)
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUserPost的变量 userPost
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[173,65] 找不到符号
+[ERROR]   符号:   方法 getPhonenumber()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[177,22] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 dbUser
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysUserServiceImpl.java:[177,46] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.ruoyi.nocode.system.entity.SysUser的变量 user
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

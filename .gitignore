@@ -1,0 +1,32 @@
+# Compiled output
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Build outputs
+build/
+out/
+*.o
+*.pyc
+__pycache__/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+
+# Misc build artifacts
+*.tmp
+*.bak
+*.swp
+*~

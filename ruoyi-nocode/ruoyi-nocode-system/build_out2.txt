@@ -1,0 +1,79 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.ruoyi:ruoyi-nocode-system >--------------------
+[INFO] Building ruoyi-nocode-system 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ ruoyi-nocode-system ---
+[INFO] Deleting D:\project\aicoding\item\ainocode\ruoyi-nocode\ruoyi-nocode-system\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ruoyi-nocode-system ---
+[INFO] Copying 26 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.12.1:compile (default-compile) @ ruoyi-nocode-system ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 127 source files with javac [debug target 17] to target\classes
+[INFO] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysDictDataServiceImpl.java: 某些输入文件使用或覆盖了已过时的 API。
+[INFO] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysDictDataServiceImpl.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[262,9] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[262,57] java.lang.System 中的 getSecurityManager() 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[267,17] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[268,23] java.lang.System 中的 setSecurityManager(java.lang.SecurityManager) 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[283,19] java.lang.System 中的 setSecurityManager(java.lang.SecurityManager) 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[360,13] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[WARNING] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/LiquorCompilerServiceImpl.java:[361,20] java.lang 中的 java.lang.SecurityManager 已过时, 且标记为待删除
+[INFO] 11 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/task/DatabaseBackupTask.java:[259,41] 未报告的异常错误java.io.IOException; 必须对其进行捕获或声明以便抛出
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[29,46] 找不到符号
+  符号:   方法 searchTokenValueByIndex(int,int,int)
+  位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[45,46] 找不到符号
+  符号:   方法 getSessionByToken(java.lang.String)
+  位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[78,42] 找不到符号
+  符号:   方法 getSessionByToken(java.lang.String)
+  位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysJobServiceImpl.java:[91,28] 找不到符号
+  符号:   方法 isValid(java.lang.String)
+  位置: 类 cn.hutool.cron.CronUtil
+[INFO] 5 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.106 s
+[INFO] Finished at: 2026-04-04T20:52:09+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.12.1:compile (default-compile) on project ruoyi-nocode-system: Compilation failure: Compilation failure: 
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/task/DatabaseBackupTask.java:[259,41] 未报告的异常错误java.io.IOException; 必须对其进行捕获或声明以便抛出
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[29,46] 找不到符号
+[ERROR]   符号:   方法 searchTokenValueByIndex(int,int,int)
+[ERROR]   位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[45,46] 找不到符号
+[ERROR]   符号:   方法 getSessionByToken(java.lang.String)
+[ERROR]   位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/OnlineUserServiceImpl.java:[78,42] 找不到符号
+[ERROR]   符号:   方法 getSessionByToken(java.lang.String)
+[ERROR]   位置: 类 cn.dev33.satoken.stp.StpUtil
+[ERROR] /D:/project/aicoding/item/ainocode/ruoyi-nocode/ruoyi-nocode-system/src/main/java/com/ruoyi/nocode/system/service/impl/SysJobServiceImpl.java:[91,28] 找不到符号
+[ERROR]   符号:   方法 isValid(java.lang.String)
+[ERROR]   位置: 类 cn.hutool.cron.CronUtil
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
