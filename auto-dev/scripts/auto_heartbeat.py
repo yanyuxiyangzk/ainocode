@@ -215,7 +215,7 @@ class AutoHeartbeat:
 
         returncode, stdout, stderr = self._run_script(
             self.quality_gate_script,
-            "--project-root", str(PROJECTS_DIR),
+            "--project", str(PROJECTS_DIR),
             "--json", str(SELF_IMPROVE_DIR / "quality-gate-report.json"),
             timeout=600
         )

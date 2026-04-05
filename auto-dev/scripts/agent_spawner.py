@@ -27,8 +27,22 @@ AGENTS_DIR = AUTO_DEV_BASE / "agents"
 SKILLS_DIR = AUTO_DEV_BASE / "skills"
 PROJECTS_DIR = AUTO_DEV_BASE.parent
 
-# Claude Code CLI 路径
-CLAUDE_CODE_CLI = "claude-code"
+# Claude Code CLI 路径 - 动态检测
+def _detect_claude_cli() -> str:
+    """动态检测 claude-code CLI 路径"""
+    try:
+        result = subprocess.run(
+            ['powershell.exe', '-Command',
+             'Get-Command claude -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source'],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return "claude-code"  # fallback
+
+CLAUDE_CODE_CLI = _detect_claude_cli()
 
 
 class AgentSpawner:
@@ -115,15 +129,23 @@ class AgentSpawner:
 
         prompt = self._get_agent_prompt(role)
 
-        # 构建命令
-        cmd = [
-            CLAUDE_CODE_CLI,
-            "--agent", role,
-            "--name", name,
-        ]
-
-        if team:
-            cmd.extend(["--team", team])
+        # 构建命令 - 处理 PowerShell 脚本
+        if CLAUDE_CODE_CLI.endswith('.ps1'):
+            # PowerShell 脚本，使用 -Command 调用
+            cmd = [
+                'powershell.exe',
+                '-ExecutionPolicy', 'Bypass',
+                '-Command',
+                f"& '{CLAUDE_CODE_CLI}' --agent {role} --name {name}" + (f" --team {team}" if team else "")
+            ]
+        else:
+            cmd = [
+                CLAUDE_CODE_CLI,
+                "--agent", role,
+                "--name", name,
+            ]
+            if team:
+                cmd.extend(["--team", team])
 
         print(f"[SPAWN] Starting agent: {name} ({role})")
         print(f"        Command: {' '.join(cmd)}")

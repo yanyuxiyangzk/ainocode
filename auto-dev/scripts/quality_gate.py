@@ -319,8 +319,12 @@ class CompileChecker(BaseChecker):
         timeout = compile_config.get("timeout", 300)
         env = compile_config.get("env", {})
 
+        # 支持多模块 Maven 项目
+        maven_module = compile_config.get("maven_module", "")
+        compile_cwd = self.project_root / maven_module if maven_module else self.project_root
+
         executor = CommandExecutor(
-            cwd=str(self.project_root),
+            cwd=str(compile_cwd),
             env=env,
             timeout=timeout
         )
@@ -373,8 +377,12 @@ class TestChecker(BaseChecker):
         timeout = test_config.get("timeout", 600)
         env = test_config.get("env", {})
 
+        # 支持多模块 Maven 项目
+        maven_module = test_config.get("maven_module", "")
+        test_cwd = self.project_root / maven_module if maven_module else self.project_root
+
         executor = CommandExecutor(
-            cwd=str(self.project_root),
+            cwd=str(test_cwd),
             env=env,
             timeout=timeout
         )
@@ -384,9 +392,9 @@ class TestChecker(BaseChecker):
         duration = time.time() - start_time
 
         # 解析测试结果
-        passed = self._count_passed(output)
-        failed = self._count_failed(output)
-        skipped = self._count_skipped(output)
+        passed = self._count_passed(stdout)
+        failed = self._count_failed(stdout)
+        skipped = self._count_skipped(stdout)
 
         if returncode == 0:
             return CheckItem(
@@ -737,11 +745,11 @@ class QualityGate:
     def _print_check_verbose(self, check_item: CheckItem):
         """打印检查详情"""
         icon = {
-            CheckResult.PASS: "✅",
-            CheckResult.FAIL: "❌",
-            CheckResult.WARN: "⚠️",
-            CheckResult.SKIP: "⏭️",
-            CheckResult.ERROR: "💥"
+            CheckResult.PASS: "[PASS]",
+            CheckResult.FAIL: "[FAIL]",
+            CheckResult.WARN: "[WARN]",
+            CheckResult.SKIP: "[SKIP]",
+            CheckResult.ERROR: "[ERROR]"
         }.get(check_item.result, "?")
 
         print(f"  {icon} {check_item.name}: {check_item.message} ({check_item.duration:.1f}s)")
@@ -752,11 +760,11 @@ class QualityGate:
         print("=" * 60)
 
         if self.result.passed and not self.result.blocked:
-            color_print(Colors.GREEN, f"✅ 质量门禁通过 (耗时: {self.result.total_duration:.1f}s)")
+            color_print(Colors.GREEN, f"[PASS] 质量门禁通过 (耗时: {self.result.total_duration:.1f}s)")
         elif self.result.blocked:
-            color_print(Colors.RED, f"❌ 质量门禁未通过，提交被阻塞")
+            color_print(Colors.RED, f"[FAIL] 质量门禁未通过，提交被阻塞")
         else:
-            color_print(Colors.YELLOW, f"⚠️ 质量门禁通过，但有警告")
+            color_print(Colors.YELLOW, f"[WARN] 质量门禁通过，但有警告")
 
         # 打印错误
         if self.result.errors:

@@ -202,7 +202,7 @@ class AutoDevRunner:
         print(color_text("[4/8] 执行质量门禁...", Colors.BLUE))
         returncode, stdout, stderr = self._run_script(
             "quality_gate.py",
-            "--project-root", str(PROJECTS_DIR),
+            "--project", str(PROJECTS_DIR),
             "--verbose",
             timeout=600
         )
@@ -217,7 +217,7 @@ class AutoDevRunner:
         print(color_text("[5/8] 执行代码审核...", Colors.BLUE))
         returncode, stdout, stderr = self._run_script(
             "reviewer.py",
-            "--project-root", str(PROJECTS_DIR),
+            "--project", str(PROJECTS_DIR),
             "--iteration", "1",
             timeout=600
         )
@@ -328,7 +328,7 @@ class AutoDevRunner:
 
         returncode, stdout, stderr = self._run_script(
             "quality_gate.py",
-            "--project-root", str(PROJECTS_DIR),
+            "--project", str(PROJECTS_DIR),
             "--verbose",
             timeout=600
         )
@@ -351,7 +351,7 @@ class AutoDevRunner:
 
         returncode, stdout, stderr = self._run_script(
             "reviewer.py",
-            "--project-root", str(PROJECTS_DIR),
+            "--project", str(PROJECTS_DIR),
             "--iteration", "1",
             "--verbose",
             timeout=600

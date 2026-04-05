@@ -601,7 +601,7 @@ class ReviewerOrchestrator:
                 all_failed.append("命名规范")
                 print(color_text(f"    发现 {len(comments)} 个命名问题", Colors.YELLOW))
             else:
-                print(color_text(f"    ✓ 通过 ({len(passed)} 项)", Colors.GREEN))
+                print(color_text(f"    [PASS] 通过 ({len(passed)} 项)", Colors.GREEN))
 
         # 2. Javadoc检查
         if standards.get('javadoc_required', False):
@@ -614,7 +614,7 @@ class ReviewerOrchestrator:
                 all_failed.append("Javadoc")
                 print(color_text(f"    发现 {len(comments)} 个Javadoc问题", Colors.YELLOW))
             else:
-                print(color_text(f"    ✓ 通过 ({len(passed)} 项)", Colors.GREEN))
+                print(color_text(f"    [PASS] 通过 ({len(passed)} 项)", Colors.GREEN))
 
         # 3. 硬编码密钥检查
         if standards.get('no_hardcoded_secrets', True):
@@ -627,11 +627,11 @@ class ReviewerOrchestrator:
                 all_failed.append("硬编码密钥")
                 for c in comments:
                     if c.severity == Severity.CRITICAL:
-                        print(color_text(f"    ✗ {c.message} ({c.file}:{c.line})", Colors.RED))
+                        print(color_text(f"    [FAIL] {c.message} ({c.file}:{c.line})", Colors.RED))
                     else:
                         print(color_text(f"    ⚠ {c.message}", Colors.YELLOW))
             else:
-                print(color_text(f"    ✓ 通过", Colors.GREEN))
+                print(color_text(f"    [PASS] 通过", Colors.GREEN))
 
         # 4. 测试覆盖率检查
         if standards.get('test_pass_rate'):
@@ -645,7 +645,7 @@ class ReviewerOrchestrator:
                 all_failed.append("测试覆盖率")
                 print(color_text(f"    发现 {len(comments)} 个覆盖率问题", Colors.YELLOW))
             else:
-                print(color_text(f"    ✓ 通过 ({len(passed)} 项)", Colors.GREEN))
+                print(color_text(f"    [PASS] 通过 ({len(passed)} 项)", Colors.GREEN))
 
         # 5. 代码复杂度检查
         print(color_text("\n  [5/5] 检查代码复杂度...", Colors.BLUE))
@@ -657,7 +657,7 @@ class ReviewerOrchestrator:
             all_failed.append("代码复杂度")
             print(color_text(f"    发现 {len(comments)} 个复杂度问题", Colors.YELLOW))
         else:
-            print(color_text(f"    ✓ 通过 ({len(passed)} 项)", Colors.GREEN))
+            print(color_text(f"    [PASS] 通过 ({len(passed)} 项)", Colors.GREEN))
 
         duration = time.time() - start_time
 
@@ -718,9 +718,9 @@ class ReviewerOrchestrator:
         }
 
         status_texts = {
-            ReviewStatus.APPROVED: "✓ APPROVED - 审核通过",
+            ReviewStatus.APPROVED: "[PASS] APPROVED - 审核通过",
             ReviewStatus.REVISION_REQUESTED: "⚠ REVISION_REQUESTED - 需要修改",
-            ReviewStatus.REJECTED: "✗ REJECTED - 审核拒绝",
+            ReviewStatus.REJECTED: "[FAIL] REJECTED - 审核拒绝",
         }
 
         print(color_text(f"状态: {status_texts[result.status]}", status_colors.get(result.status, Colors.RESET)))
@@ -730,14 +730,14 @@ class ReviewerOrchestrator:
         print(color_text(f"\n检查项:", Colors.BOLD))
         if result.passed_checks:
             for check in result.passed_checks[:5]:
-                print(color_text(f"  ✓ {check}", Colors.GREEN))
+                print(color_text(f"  [PASS] {check}", Colors.GREEN))
             if len(result.passed_checks) > 5:
                 print(color_text(f"  ... 还有 {len(result.passed_checks) - 5} 项", Colors.BLUE))
 
         if result.failed_checks:
             print(color_text(f"\n失败项:", Colors.RED))
             for check in result.failed_checks:
-                print(color_text(f"  ✗ {check}", Colors.RED))
+                print(color_text(f"  [FAIL] {check}", Colors.RED))
 
         if result.comments:
             critical = [c for c in result.comments if c.severity == Severity.CRITICAL]
