@@ -275,6 +275,70 @@
             color: #8b949e;
         }
         .no-data .icon { font-size: 48px; margin-bottom: 16px; }
+
+        /* History section */
+        .history-section {
+            background: #161b22;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+        .history-section h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #21262d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .history-item:hover {
+            background: #30363d;
+        }
+        .history-item .pip-id {
+            font-size: 12px;
+            font-weight: 600;
+            color: #58a6ff;
+            min-width: 180px;
+        }
+        .history-item .pip-progress {
+            font-size: 12px;
+            color: #8b949e;
+            min-width: 60px;
+        }
+        .history-item .pip-status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        .history-item .pip-status.completed { background: #238636; color: #fff; }
+        .history-item .pip-status.failed { background: #da3633; color: #fff; }
+        .history-item .pip-status.running { background: #1f6feb; color: #fff; }
+
+        .history-item-detail {
+            display: none;
+            padding: 12px;
+            background: #161b22;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .history-item.expanded .history-item-detail {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -328,19 +392,71 @@
         }
 
         function render(data) {
-            if (!data || !data.pipeline_id) {
+            // Support new format with current + history, or legacy format
+            const currentData = data?.current || data;
+            const history = data?.history || [];
+
+            if (!currentData || !currentData.pipeline_id) {
+                // No current pipeline, show history only
+                let historyHtml = '';
+                if (history.length > 0) {
+                    historyHtml = renderHistoryList(history);
+                }
+
                 document.getElementById('content').innerHTML = `
                     <div class="no-data">
                         <div class="icon">📊</div>
                         <p>No pipeline running</p>
                         <p style="font-size: 12px; margin-top: 8px;">Start a pipeline to see the dashboard</p>
                     </div>
+                    ${historyHtml ? `<div class="history-section"><h3>Recent Pipelines (${history.length})</h3><div class="history-list">${historyHtml}</div></div>` : ''}
                 `;
                 document.getElementById('statusBadge').className = 'status-badge stopped';
-                document.getElementById('statusBadge').textContent = 'No Pipeline';
+                document.getElementById('statusBadge').textContent = history.length > 0 ? 'Idle' : 'No Pipeline';
                 return;
             }
 
+            // Render current pipeline
+            renderCurrentPipeline(currentData);
+
+            // Render history
+            if (history.length > 0) {
+                const historySection = document.createElement('div');
+                historySection.className = 'history-section';
+                historySection.innerHTML = `
+                    <h3>Recent Pipelines (${history.length})</h3>
+                    <div class="history-list">${renderHistoryList(history)}</div>
+                `;
+                document.getElementById('content').appendChild(historySection);
+            }
+        }
+
+        function renderHistoryList(history) {
+            return history.map(h => {
+                const completed = Object.values(h.stages || {}).filter(s => s.status === 'completed').length;
+                const total = 5;
+                const progress = Math.round((completed / total) * 100);
+                let status = 'running';
+                let statusText = 'Running';
+                if (progress === 100) { status = 'completed'; statusText = 'Done'; }
+                else if (Object.values(h.stages || {}).some(s => s.status === 'failed')) { status = 'failed'; statusText = 'Failed'; }
+
+                return `
+                    <div class="history-item" onclick="this.classList.toggle('expanded')">
+                        <span class="pip-id">${h.pipeline_id}</span>
+                        <span class="pip-progress">${progress}%</span>
+                        <span class="pip-status ${status}">${statusText}</span>
+                        <div class="history-item-detail">
+                            <div>Requirement: ${(h.requirement || '').substring(0, 50)}...</div>
+                            <div>Started: ${formatTime(h.started_at)}</div>
+                            <div>Last Update: ${formatTime(h.last_updated)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCurrentPipeline(data) {
             const stages = data.stages || {};
             const stageNames = {
                 'requirement': '需求',
@@ -483,7 +599,7 @@
 
             document.getElementById('statusBadge').className = `status-badge ${overallStatus}`;
             document.getElementById('statusBadge').textContent = statusText;
-            document.getElementById('lastUpdate').textContent = formatTime(data.last_updated);
+            document.getElementById('lastUpdate').textContent = formatTime(data.last_updated || data.updated_at);
         }
 
         async function loadStatus() {

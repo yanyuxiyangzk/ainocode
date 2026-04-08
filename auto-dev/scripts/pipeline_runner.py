@@ -635,14 +635,15 @@ class PipelineRunner:
         """
         [DASHBOARD] 更新可视化状态文件
         生成 dashboard.html 读取的 _current_status.json
+        支持历史任务记录
         """
         try:
             pipeline = self.get_pipeline(pipeline_id)
             if not pipeline:
                 return
 
-            # 构建状态数据
-            status = {
+            # 构建当前任务状态
+            current_status = {
                 "pipeline_id": pipeline_id,
                 "requirement": pipeline.get("requirement", ""),
                 "current_stage": current_stage or pipeline.get("current_stage", ""),
@@ -656,7 +657,7 @@ class PipelineRunner:
 
             # 填充阶段状态
             for stage_name, stage_info in pipeline.get("stages", {}).items():
-                status["stages"][stage_name] = {
+                current_status["stages"][stage_name] = {
                     "status": stage_info.get("status", "pending"),
                     "start_time": stage_info.get("start_time"),
                     "end_time": stage_info.get("end_time"),
@@ -670,7 +671,7 @@ class PipelineRunner:
                 try:
                     with open(team_config_path, "r", encoding="utf-8") as f:
                         team_data = json.load(f)
-                        status["team"] = team_data.get("members", [])
+                        current_status["team"] = team_data.get("members", [])
                 except:
                     pass
 
@@ -679,7 +680,7 @@ class PipelineRunner:
             try:
                 mem_mgr = MemoryTierManager()
                 mem_status = mem_mgr.status()
-                status["memory"] = {
+                current_status["memory"] = {
                     "hot_lines": mem_status.get("hot", {}).get("lines", 0),
                     "warm_lines": mem_status.get("warm", {}).get("lines", 0),
                     "cold_files": mem_status.get("cold", {}).get("files", 0)
@@ -689,15 +690,43 @@ class PipelineRunner:
 
             # 添加活动记录
             if activity:
-                status["activities"] = [{
+                current_status["activities"] = [{
                     "time": datetime.now().isoformat(),
                     "message": activity,
                     "type": "info"
                 }]
 
-            # 写入状态文件
+            # 加载历史记录
+            history_file = PIPELINES_DIR / "_dashboard_history.json"
+            history = []
+            if history_file.exists():
+                try:
+                    with open(history_file, "r", encoding="utf-8") as f:
+                        history = json.load(f)
+                except:
+                    history = []
+
+            # 从历史中移除当前pipeline（如果存在）
+            history = [h for h in history if h.get("pipeline_id") != pipeline_id]
+
+            # 添加到历史开头
+            history.insert(0, current_status)
+
+            # 保留最近10个历史
+            history = history[:10]
+
+            # 写入历史记录
+            with open(history_file, "w", encoding="utf-8") as f:
+                json.dump(history, f, ensure_ascii=False, indent=2)
+
+            # 写入当前状态（供Dashboard显示）
+            dashboard_data = {
+                "current": current_status,
+                "history": history[1:],  # 除了当前任务外的历史
+                "updated_at": datetime.now().isoformat()
+            }
             with open(DASHBOARD_STATUS_FILE, "w", encoding="utf-8") as f:
-                json.dump(status, f, ensure_ascii=False, indent=2)
+                json.dump(dashboard_data, f, ensure_ascii=False, indent=2)
 
         except Exception as e:
             print(f"[WARN] Dashboard status update failed: {e}")
