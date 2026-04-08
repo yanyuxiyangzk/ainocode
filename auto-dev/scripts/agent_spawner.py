@@ -64,12 +64,20 @@ class AgentSpawner:
 
         return {
             "dev-team": {
-                "description": "开发团队",
+                "description": "开发团队(基础)",
                 "agents": ["backend-dev", "frontend-dev", "tester"]
             },
             "full-team": {
-                "description": "完整团队",
-                "agents": ["backend-dev", "frontend-dev", "tester", "devops", "architect"]
+                "description": "完整团队(全角色)",
+                "agents": ["product-manager", "architect", "backend-dev", "frontend-dev", "ui-designer", "tester", "devops", "reviewer"]
+            },
+            "frontend-team": {
+                "description": "前端团队",
+                "agents": ["frontend-dev", "ui-designer", "tester"]
+            },
+            "backend-team": {
+                "description": "后端团队",
+                "agents": ["backend-dev", "architect", "tester"]
             }
         }
 

@@ -477,9 +477,31 @@ class AutoDevRunner:
         self_improve_dir = AUTO_DEV_BASE / "self-improving"
         if self_improve_dir.exists():
             print(f"  {color_text('[OK]', Colors.GREEN)} self-improving/ 目录存在")
-        else:
-            print(f"  {color_text('[MISSING]', Colors.RED)} self-improving/ 目录")
+
+        # 检查 Harness 架构
+        print(color_text("\n[6] Harness 架构 (Guides/Sensors/Memory)", Colors.BLUE))
+        guides_ok = (AUTO_DEV_BASE / "guides").exists()
+        sensors_ok = (AUTO_DEV_BASE / "sensors").exists()
+        memory_ok = (AUTO_DEV_BASE / "memory").exists()
+        schema_ok = (AUTO_DEV_BASE / "guides" / "schemas").exists()
+        telemetry_ok = (AUTO_DEV_BASE / "sensors" / "runtime" / "telemetry").exists()
+
+        print(f"  {color_text('[OK]' if guides_ok else '[MISSING]', Colors.GREEN if guides_ok else Colors.RED)} guides/ (引导层)")
+        print(f"  {color_text('[OK]' if sensors_ok else '[MISSING]', Colors.GREEN if sensors_ok else Colors.RED)} sensors/ (感知层)")
+        print(f"  {color_text('[OK]' if memory_ok else '[MISSING]', Colors.GREEN if memory_ok else Colors.RED)} memory/ (记忆层)")
+        print(f"  {color_text('[OK]' if schema_ok else '[MISSING]', Colors.GREEN if schema_ok else Colors.RED)} schemas/ (类型化约束)")
+        print(f"  {color_text('[OK]' if telemetry_ok else '[MISSING]', Colors.GREEN if telemetry_ok else Colors.RED)} telemetry/ (全链路可观测)")
+
+        if not all([guides_ok, sensors_ok, memory_ok, schema_ok, telemetry_ok]):
             all_ok = False
+            missing = []
+            if not guides_ok: missing.append("guides")
+            if not sensors_ok: missing.append("sensors")
+            if not memory_ok: missing.append("memory")
+            if not schema_ok: missing.append("schemas")
+            if not telemetry_ok: missing.append("telemetry")
+            for m in missing:
+                print(f"  {color_text('[MISSING]', Colors.RED)} {m}/")
 
         # 总结
         print(color_text("\n" + "=" * 60, Colors.CYAN))

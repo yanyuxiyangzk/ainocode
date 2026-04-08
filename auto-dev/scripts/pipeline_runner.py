@@ -36,6 +36,8 @@ PIPELINES_DIR = AUTO_DEV_BASE / "tasks" / "pipeline"
 TEAMS_DIR = AUTO_DEV_BASE / "teams"
 SCRIPTS_DIR = AUTO_DEV_BASE / "scripts"
 SKILLS_DIR = AUTO_DEV_BASE / "skills"
+MEMORY_DIR = AUTO_DEV_BASE / "memory"
+MEMORY_TIER_MANAGER = MEMORY_DIR / "memory_tier_manager.py"
 
 # 阶段定义
 STAGES = ["requirement", "design", "development", "testing", "deployment"]
@@ -47,10 +49,23 @@ STAGE_NAMES = {
     "deployment": "上线部署"
 }
 
-# Agent角色
-DEV_ROLES = ["backend-dev", "frontend-dev"]
+# Agent角色 - 全角色团队 (8角色)
+ALL_ROLES = [
+    "product-manager",   # 产品经理
+    "architect",         # 架构师
+    "backend-dev",       # 后端开发
+    "frontend-dev",      # 前端开发
+    "ui-designer",       # UI设计师
+    "tester",            # 测试工程师
+    "devops",            # DevOps
+    "reviewer"           # 审核员
+]
+
+# 角色分类 (保持向后兼容)
+DEV_ROLES = ["backend-dev", "frontend-dev", "ui-designer"]
 QA_ROLES = ["tester"]
-OPS_ROLES = ["devops", "operation"]
+OPS_ROLES = ["devops"]
+PM_ROLES = ["product-manager", "architect"]
 
 
 class PipelineRunner:
@@ -210,8 +225,8 @@ class PipelineRunner:
             "members": []
         }
 
-        # 添加开发角色
-        for role in DEV_ROLES + QA_ROLES:
+        # 添加所有角色
+        for role in ALL_ROLES:
             agent_file = AUTO_DEV_BASE / "agents" / f"{role}.md"
             if agent_file.exists():
                 team_config["members"].append({
@@ -261,6 +276,57 @@ class PipelineRunner:
 
         # 如果是自动化流水线模式（有 pipeline_id），允许绕过
         return True, "Auto-dev pipeline mode - team check bypassed"
+
+    def _run_memory_management(self, action: str = "compact") -> Tuple[bool, str]:
+        """
+        [MEMORY] 自动记忆层级管理
+        在关键节点调用，保持记忆层健康
+        """
+        if not MEMORY_TIER_MANAGER.exists():
+            return True, "memory_tier_manager.py not found, skip"
+
+        print(f"\n[MEMORY] Running tier management: {action}")
+
+        try:
+            if action == "compact":
+                result = subprocess.run(
+                    [sys.executable, str(MEMORY_TIER_MANAGER), "compact"],
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode == 0:
+                    print(f"[MEMORY] Hot tier compacted")
+                    return True, "compact done"
+                else:
+                    print(f"[MEMORY] compact warning: {result.stderr[:100]}")
+                    return True, "compact skipped"
+
+            elif action == "cleanup":
+                result = subprocess.run(
+                    [sys.executable, str(MEMORY_TIER_MANAGER), "cleanup", "--days", "90"],
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.returncode == 0:
+                    print(f"[MEMORY] Cold tier cleaned up")
+                    return True, "cleanup done"
+                else:
+                    print(f"[MEMORY] cleanup warning: {result.stderr[:100]}")
+                    return True, "cleanup skipped"
+
+            elif action == "status":
+                result = subprocess.run(
+                    [sys.executable, str(MEMORY_TIER_MANAGER), "status"],
+                    capture_output=True, text=True, timeout=30
+                )
+                if result.stdout:
+                    print(result.stdout)
+                return True, "status done"
+
+            else:
+                return True, f"unknown action: {action}"
+
+        except Exception as e:
+            print(f"[MEMORY] Error: {e}")
+            return True, f"memory management error: {e}"
 
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """执行质量检查（集成 quality_gate.py）"""
@@ -454,81 +520,128 @@ class PipelineRunner:
         return True, f"Design stage completed, team prepared: {team['name']}"
 
     def run_development_stage(self, pipeline_id: str) -> Tuple[bool, str]:
-        """开发实现阶段"""
+        """开发实现阶段 - 多角色并行协作"""
         team_name = f"team-{pipeline_id}"
         pipeline_dir = self.pipelines_dir / pipeline_id
+        design_file = pipeline_dir / "02-design.md"
 
-        # 读取需求文档
-        requirement_file = pipeline_dir / "01-requirement.md"
+        # 读取需求和设计文档
         requirement = "新功能开发"
-        if requirement_file.exists():
-            with open(requirement_file, "r", encoding="utf-8") as f:
+        design = ""
+        if (pipeline_dir / "01-requirement.md").exists():
+            with open(pipeline_dir / "01-requirement.md", "r", encoding="utf-8") as f:
                 content = f.read()
-                # 提取需求描述（简单处理）
                 lines = content.split('\n')
                 for line in lines:
-                    if line.startswith('#') or line.startswith('##'):
+                    if line.startswith('#') and not line.startswith('##'):
                         requirement = line.lstrip('#').strip()
                         break
+                requirement_content = content
 
-        print(f"\n[DEV STAGE] Starting parallel development...")
+        if design_file.exists():
+            with open(design_file, "r", encoding="utf-8") as f:
+                design = f.read()
+
+        print(f"\n[DEV STAGE] Starting multi-agent parallel development...")
         print(f"[INFO] Team: {team_name}")
         print(f"[INFO] Requirement: {requirement}")
 
-        # 生成启动命令供参考
-        launch_script = f'''#!/bin/bash
-# Development Team Launcher for {pipeline_id}
-cd {AUTO_DEV_BASE}
-python scripts/team_launcher.py launch-all {pipeline_id}
-'''
-        script_file = pipeline_dir / "launch-dev.sh"
-        with open(script_file, "w", encoding="utf-8") as f:
-            f.write(launch_script)
+        # 全角色团队
+        team_type = "full-team"
 
-        # 调用 agent_spawner 启动 Agent 团队
+        # 生成 Agent 任务分配文件
+        task_file = pipeline_dir / "agent-tasks.md"
+        with open(task_file, "w", encoding="utf-8") as f:
+            f.write(f"# Agent Tasks for Pipeline {pipeline_id}\n\n")
+            f.write(f"## 需求描述\n{requirement}\n\n")
+            f.write(f"## 设计文档\n{design[:2000] if design else '见 02-design.md'}\n\n")
+
+            # Product Manager 任务
+            f.write("## Product Manager (产品经理)\n")
+            f.write("- 需求澄清和细化\n")
+            f.write("- 任务优先级排序\n")
+            f.write("- 验收标准制定\n\n")
+
+            # Architect 任务
+            f.write("## Architect (架构师)\n")
+            f.write("- 审核技术方案\n")
+            f.write("- 提供技术指导\n")
+            f.write("- 解决技术难点\n\n")
+
+            # Backend Developer 任务
+            f.write("## Backend Developer (后端开发)\n")
+            f.write(f"- 实现后端服务和API\n")
+            f.write(f"- 数据库设计和实现\n")
+            f.write("- 编写单元测试\n")
+            f.write("- 确保编译通过\n\n")
+
+            # Frontend Developer 任务
+            f.write("## Frontend Developer (前端开发)\n")
+            f.write(f"- 实现前端界面和组件\n")
+            f.write("- 对接后端API\n")
+            f.write("- 编写单元测试\n")
+            f.write("- 确保UI/UX一致\n\n")
+
+            # UI Designer 任务
+            f.write("## UI Designer (UI设计师)\n")
+            f.write("- 设计界面原型\n")
+            f.write("- 制定视觉规范\n")
+            f.write("- 协助前端实现\n\n")
+
+            # Tester 任务
+            f.write("## Tester (测试工程师)\n")
+            f.write("- 编写测试用例\n")
+            f.write("- 执行集成测试\n")
+            f.write("- 验证功能正确性\n\n")
+
+            # DevOps 任务
+            f.write("## DevOps (运维工程师)\n")
+            f.write("- 准备部署环境\n")
+            f.write("- 配置CI/CD流水线\n")
+            f.write("- 监控系统准备\n\n")
+
+        print(f"\n[TASKS] Agent tasks written to: {task_file}")
+
+        # 调用 agent_spawner 启动完整 Agent 团队
         agent_spawner_script = SCRIPTS_DIR / "agent_spawner.py"
         if agent_spawner_script.exists():
-            print(f"\n[SPAWNER] Launching agent team: dev-team")
+            print(f"\n[SPAWNER] Launching full team: {team_type}")
             try:
                 result = subprocess.run(
-                    [sys.executable, str(agent_spawner_script), "spawn-all", "--team", "dev-team"],
+                    [sys.executable, str(agent_spawner_script), "spawn-all", "--team", team_type],
                     cwd=str(AUTO_DEV_BASE),
                     capture_output=True,
                     text=True,
                     timeout=60
                 )
                 if result.returncode == 0:
-                    print(f"[SPAWNER] Agent team launched successfully")
-                    print(f"[SPAWNER] Output: {result.stdout[:500] if result.stdout else 'OK'}")
+                    print(f"[SPAWNER] Full team launched successfully")
+                    # 显示启动的 Agents
+                    lines = result.stdout.split('\n') if result.stdout else []
+                    for line in lines:
+                        if 'Agent' in line or 'started' in line:
+                            print(f"  {line}")
                 else:
                     print(f"[SPAWNER] Warning: {result.stderr[:200] if result.stderr else 'spawn returned non-zero'}")
             except Exception as e:
                 print(f"[SPAWNER] Warning: Failed to launch agents: {e}")
                 print(f"[SPAWNER] Falling back to manual launch")
 
-        # 生成 Agent 任务描述文件
-        task_file = pipeline_dir / "agent-tasks.txt"
-        with open(task_file, "w", encoding="utf-8") as f:
-            f.write(f"# Development Tasks for Pipeline {pipeline_id}\n")
-            f.write(f"# Requirement: {requirement}\n\n")
-            f.write("## Frontend Development\n")
-            f.write(f"- Implement {requirement}\n")
-            f.write("- Follow project coding standards\n")
-            f.write("- Write unit tests\n\n")
-            f.write("## Backend Development\n")
-            f.write(f"- Implement {requirement} API\n")
-            f.write("- Write unit tests\n\n")
-            f.write("## Testing\n")
-            f.write("- Verify functionality\n")
-            f.write("- Ensure tests pass\n")
+        print(f"\n[INFO] Team Roles:")
+        print(f"  [PM]   Product Manager  - 需求管理")
+        print(f"  [ARCH]  Architect       - 架构设计")
+        print(f"  [BE]   Backend Dev     - 后端开发")
+        print(f"  [FE]   Frontend Dev    - 前端开发")
+        print(f"  [UI]   UI Designer     - UI设计")
+        print(f"  [TEST] Tester          - 测试工程师")
+        print(f"  [DEVOPS] DevOps        - 运维部署")
 
-        print(f"\n[INFO] Agent tasks: {task_file}")
         print(f"\n[INFO] After development, pipeline will automatically trigger:")
         print(f"       1. quality_gate.py (quality gate)")
-        print(f"       2. reviewer.py (code review)")
-        print(f"       3. Iterations if REVISION_REQUESTED (max 3)")
+        print(f"       2. reviewer.py (code review, max 3 iterations)")
+        print(f"       3. checkpoint save")
 
-        return True, f"Development team launched for: {requirement}"
+        return True, f"Full team launched for: {requirement}"
 
     def run_testing_stage(self, pipeline_id: str) -> Tuple[bool, str]:
         """测试验证阶段"""
@@ -573,6 +686,9 @@ python scripts/team_launcher.py launch-all {pipeline_id}
         print(f"\n[PIPELINE RUN] {pipeline_id}")
         print(f"Requirement: {pipeline['requirement']}")
         print("=" * 60)
+
+        # [MEMORY] Pipeline开始前检查记忆状态
+        self._run_memory_management("status")
 
         results = {"pipeline_id": pipeline_id, "stages": {}}
 
@@ -623,6 +739,14 @@ python scripts/team_launcher.py launch-all {pipeline_id}
                         print(f"[REVIEWER] Code review passed!")
                     elif not results["stages"][stage].get("reviewer_result"):
                         results["stages"][stage]["reviewer_result"] = "SKIPPED"
+
+            # [MEMORY] testing阶段后整理热层
+            if stage == "testing":
+                self._run_memory_management("compact")
+
+        # [MEMORY] Pipeline结束后清理冷层
+        self._run_memory_management("cleanup")
+        self._run_memory_management("status")
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
