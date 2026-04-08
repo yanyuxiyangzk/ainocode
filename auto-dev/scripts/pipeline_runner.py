@@ -702,6 +702,119 @@ class PipelineRunner:
         except Exception as e:
             print(f"[WARN] Dashboard status update failed: {e}")
 
+    def _print_progress_bar(self, pipeline_id: str = None, current_stage: str = None):
+        """
+        [PROGRESS] 打印ASCII进度条 (Windows兼容)
+        流水线执行时在关键节点调用更新进度显示
+        """
+        try:
+            pipeline = None
+            if pipeline_id:
+                pipeline = self.get_pipeline(pipeline_id)
+
+            # 阶段标签
+            stage_labels = {
+                "requirement": "REQ",
+                "design": "DSG",
+                "development": "DEV",
+                "testing": "TEST",
+                "deployment": "DEPLOY"
+            }
+
+            # 获取阶段状态
+            stages_status = {}
+            if pipeline and "stages" in pipeline:
+                for stage_name in STAGES:
+                    info = pipeline["stages"].get(stage_name, {})
+                    stages_status[stage_name] = info.get("status", "pending")
+            else:
+                for stage_name in STAGES:
+                    stages_status[stage_name] = "pending"
+
+            # 计算进度
+            completed = sum(1 for s in stages_status.values() if s == "completed")
+            progress = int((completed / len(STAGES)) * 100)
+
+            # 获取团队状态
+            team_members = []
+            if pipeline_id:
+                team_config_path = TEAMS_DIR / f"team-{pipeline_id}.json"
+                if team_config_path.exists():
+                    try:
+                        with open(team_config_path, "r", encoding="utf-8") as f:
+                            team_data = json.load(f)
+                            team_members = team_data.get("members", [])
+                    except:
+                        pass
+
+            # 获取记忆状态
+            hot_lines = 0
+            warm_lines = 0
+            try:
+                from memory.memory_tier_manager import MemoryTierManager
+                mem_mgr = MemoryTierManager()
+                mem_status = mem_mgr.status()
+                hot_lines = mem_status.get("hot", {}).get("lines", 0)
+                warm_lines = mem_status.get("warm", {}).get("lines", 0)
+            except:
+                pass
+
+            # 构建阶段状态 (ASCII兼容)
+            # V=completed, *=in_progress, X=failed, -=pending
+            stage_chars = []
+            for stage_name in STAGES:
+                status = stages_status.get(stage_name, "pending")
+                label = stage_labels.get(stage_name, stage_name[:4].upper())
+                if status == "completed":
+                    stage_chars.append(f"[V]{label}")
+                elif status == "in_progress":
+                    stage_chars.append(f"[*]{label}")
+                elif status == "failed":
+                    stage_chars.append(f"[X]{label}")
+                else:
+                    stage_chars.append(f"[-]{label}")
+
+            stages_line = " -> ".join(stage_chars)
+
+            # 团队状态
+            role_short = {
+                "product-manager": "PM", "architect": "ARCH", "backend-dev": "BE",
+                "frontend-dev": "FE", "ui-designer": "UI", "tester": "TEST",
+                "devops": "DEV", "reviewer": "REV"
+            }
+            team_chars = []
+            for m in team_members[:8]:
+                role = m.get("role", "")
+                status = m.get("status", "idle")
+                short = role_short.get(role, role[:3].upper())
+                if status in ["active", "in_progress"]:
+                    team_chars.append(f"[*]{short}")
+                else:
+                    team_chars.append(f"[-]{short}")
+
+            # 记忆条 (ASCII: #=filled, .=empty)
+            hot_pct = min(100, hot_lines)
+            hot_bar = "#" * (hot_pct // 10) + "." * (10 - hot_pct // 10)
+            warm_pct = min(100, warm_lines // 2)
+            warm_bar = "#" * (warm_pct // 10) + "." * (10 - warm_pct // 10)
+
+            # 打印进度框
+            pid_str = pipeline_id or "PIPELINE"
+
+            print(f"""
++------------------------------------------------------------------+
+|  Auto-Dev 2.0 Pipeline                                           |
++------------------------------------------------------------------+
+|  [{pid_str}]  {progress:3d}%  {stages_line}
+|                                                                   |
+|  Team: {" ".join(team_chars) if team_chars else "No team"}
+|  MEM:  HOT [{hot_bar}] {hot_lines:3d}/100  WARM [{warm_bar}] {warm_lines:3d}/200
++------------------------------------------------------------------+""")
+
+        except Exception as e:
+            # 进度条失败不影响主流程
+            pass
+
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """执行质量检查（集成 quality_gate.py）"""
         pipeline_dir = self.pipelines_dir / pipeline_id
@@ -1076,6 +1189,9 @@ class PipelineRunner:
         # [DASHBOARD] 初始化仪表盘状态
         self._update_dashboard_status(pipeline_id, "requirement", f"Pipeline started: {pipeline['requirement'][:50]}")
 
+        # [PROGRESS] 显示初始进度条
+        self._print_progress_bar(pipeline_id, "requirement")
+
         # [CHECKPOINT] 检查是否需要恢复 + 保存初始checkpoint
         recovery_pipeline = self._check_recovery_needed()
         if recovery_pipeline and recovery_pipeline != pipeline_id:
@@ -1092,6 +1208,9 @@ class PipelineRunner:
 
             # [DASHBOARD] 更新阶段状态
             self._update_dashboard_status(pipeline_id, stage, f"Stage {stage} started")
+
+            # [PROGRESS] 显示阶段进度
+            self._print_progress_bar(pipeline_id, stage)
 
             ok, msg = self.run_stage(pipeline_id, stage)
             results["stages"][stage] = {"success": ok, "message": msg}
@@ -1223,6 +1342,9 @@ class PipelineRunner:
             self._record_pace_end(pipeline_id, success=False)
             # [DASHBOARD] 更新失败状态
             self._update_dashboard_status(pipeline_id, "failed", f"Pipeline failed at stage {stage}")
+
+        # [PROGRESS] 显示最终进度
+        self._print_progress_bar(pipeline_id)
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
