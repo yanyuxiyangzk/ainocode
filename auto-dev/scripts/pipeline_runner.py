@@ -24,6 +24,8 @@ Pipeline Runner - 流水线自动执行器
 import os
 import sys
 import json
+import re
+import hashlib
 import subprocess
 import argparse
 from datetime import datetime
@@ -38,6 +40,11 @@ SCRIPTS_DIR = AUTO_DEV_BASE / "scripts"
 SKILLS_DIR = AUTO_DEV_BASE / "skills"
 MEMORY_DIR = AUTO_DEV_BASE / "memory"
 MEMORY_TIER_MANAGER = MEMORY_DIR / "memory_tier_manager.py"
+
+# Checkpoint & Self-improving
+STATE_DIR = AUTO_DEV_BASE / "self-improving"
+CHECKPOINT_FILE = STATE_DIR / "checkpoint.json"
+STUCK_STATE_FILE = STATE_DIR / "stuck-state.json"
 
 # 阶段定义
 STAGES = ["requirement", "design", "development", "testing", "deployment"]
@@ -327,6 +334,212 @@ class PipelineRunner:
         except Exception as e:
             print(f"[MEMORY] Error: {e}")
             return True, f"memory management error: {e}"
+
+    # ==================== Checkpoint & Stuck Detection ====================
+
+    def _load_checkpoint(self) -> Optional[Dict]:
+        """加载checkpoint状态"""
+        if not CHECKPOINT_FILE.exists():
+            return None
+        try:
+            with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return None
+
+    def _save_checkpoint(self, pipeline_id: str, stage: str, status: str = "in_progress"):
+        """
+        [CHECKPOINT] 保存Pipeline断点
+        关键时机调用: Pipeline开始、每个阶段完成/失败后
+        """
+        checkpoint = self._load_checkpoint() or {
+            "version": "1.0",
+            "last_heartbeat": None,
+            "active_pipelines": [],
+            "pipeline_states": {},
+            "stats": {"total_runs": 0, "completed": 0, "failed": 0}
+        }
+
+        now = datetime.now().isoformat()
+        checkpoint["last_heartbeat"] = now
+
+        # 更新Pipeline状态
+        if pipeline_id not in checkpoint["active_pipelines"]:
+            checkpoint["active_pipelines"].append(pipeline_id)
+
+        checkpoint["pipeline_states"][pipeline_id] = {
+            "current_stage": stage,
+            "status": status,
+            "updated_at": now
+        }
+
+        # 统计
+        checkpoint["stats"]["total_runs"] = checkpoint["stats"].get("total_runs", 0) + 1
+
+        try:
+            STATE_DIR.mkdir(exist_ok=True)
+            with open(CHECKPOINT_FILE, "w", encoding="utf-8") as f:
+                json.dump(checkpoint, f, ensure_ascii=False, indent=2)
+            print(f"[CHECKPOINT] Saved: {pipeline_id} @ {stage} ({status})")
+        except Exception as e:
+            print(f"[WARN] Failed to save checkpoint: {e}")
+
+    def _check_recovery_needed(self) -> Optional[str]:
+        """
+        [CHECKPOINT] 检查是否需要恢复
+        Returns: pipeline_id if recovery needed, else None
+        """
+        checkpoint = self._load_checkpoint()
+        if not checkpoint:
+            return None
+
+        last_heartbeat = checkpoint.get("last_heartbeat")
+        if not last_heartbeat:
+            return None
+
+        # 检查心跳是否过期 (超过10分钟)
+        from datetime import timedelta
+        last_time = datetime.fromisoformat(last_heartbeat)
+        if datetime.now() - last_time > timedelta(minutes=10):
+            # 有进行中的Pipeline吗?
+            active = checkpoint.get("active_pipelines", [])
+            if active:
+                # 返回最新的进行中pipeline
+                return active[-1]
+        return None
+
+    def _is_stuck(self, pipeline_id: str, error_msg: str = "") -> bool:
+        """
+        [STUCK] 检测Pipeline是否卡死
+        条件: 相同错误重复3次 或 迭代超过5次
+        """
+        if not STUCK_STATE_FILE.exists():
+            return False
+
+        try:
+            with open(STUCK_STATE_FILE, "r", encoding="utf-8") as f:
+                state = json.load(f)
+        except:
+            return False
+
+        stuck_tasks = state.get("stuck_tasks", [])
+        if pipeline_id in stuck_tasks:
+            return True
+
+        # 检查相同错误重复
+        if error_msg:
+            error_history = state.get("error_history", {}).get(pipeline_id, [])
+            # 归一化错误
+            normalized = error_msg.strip().lower()[:200]
+            import hashlib
+            error_hash = hashlib.md5(normalized.encode()).hexdigest()[:8]
+
+            same_errors = [e for e in error_history[-5:] if e.get("hash") == error_hash]
+            if len(same_errors) >= 2:  # 3次中取2次即预警
+                return True
+
+        return False
+
+    def _record_error_and_check_stuck(self, pipeline_id: str, error_msg: str) -> Tuple[bool, str]:
+        """
+        [STUCK] 记录错误并检测是否卡死
+        Returns: (is_stuck: bool, message: str)
+        """
+        error_hash = hashlib.md5(error_msg.strip().lower()[:200].encode()).hexdigest()[:8] if error_msg else "unknown"
+
+        state = {"error_history": {}, "iteration_count": {}, "stuck_tasks": []}
+        if STUCK_STATE_FILE.exists():
+            try:
+                with open(STUCK_STATE_FILE, "r", encoding="utf-8") as f:
+                    state = json.load(f)
+            except:
+                pass
+
+        if pipeline_id not in state["error_history"]:
+            state["error_history"][pipeline_id] = []
+            state["iteration_count"][pipeline_id] = 0
+
+        # 记录错误
+        state["error_history"][pipeline_id].append({
+            "hash": error_hash,
+            "error": error_msg[:100],
+            "time": datetime.now().isoformat()
+        })
+        state["iteration_count"][pipeline_id] = state["iteration_count"].get(pipeline_id, 0) + 1
+
+        # 检查是否卡死
+        is_stuck = False
+        if state["iteration_count"][pipeline_id] >= 5:
+            is_stuck = True
+            if pipeline_id not in state["stuck_tasks"]:
+                state["stuck_tasks"].append(pipeline_id)
+
+        try:
+            STATE_DIR.mkdir(exist_ok=True)
+            with open(STUCK_STATE_FILE, "w", encoding="utf-8") as f:
+                json.dump(state, f, ensure_ascii=False, indent=2)
+        except:
+            pass
+
+        if is_stuck:
+            return True, f"[STUCK DETECTED] Pipeline {pipeline_id} stuck after {state['iteration_count'][pipeline_id]} iterations"
+        return False, "error recorded"
+
+    def _clear_stuck_state(self, pipeline_id: str):
+        """清除卡死状态"""
+        if not STUCK_STATE_FILE.exists():
+            return
+
+        try:
+            with open(STUCK_STATE_FILE, "r", encoding="utf-8") as f:
+                state = json.load(f)
+        except:
+            return
+
+        if pipeline_id in state.get("stuck_tasks", []):
+            state["stuck_tasks"].remove(pipeline_id)
+        state["error_history"].pop(pipeline_id, None)
+        state["iteration_count"].pop(pipeline_id, None)
+
+        try:
+            with open(STUCK_STATE_FILE, "w", encoding="utf-8") as f:
+                json.dump(state, f, ensure_ascii=False, indent=2)
+        except:
+            pass
+
+    def _try_self_heal(self, pipeline_id: str, error_msg: str) -> Tuple[bool, str]:
+        """
+        [SELF-HEAL] 尝试自动修复CI错误
+        支持: mvn依赖、npm依赖、格式化问题
+        """
+        # 延迟导入避免循环依赖
+        sys.path.insert(0, str(SCRIPTS_DIR))
+        try:
+            from rule_guard import SelfHealer
+        except ImportError:
+            return False, "SelfHealer not available"
+
+        healer = SelfHealer()
+        error_type = healer.classify_error(error_msg)
+
+        if not error_type:
+            return False, f"Unknown error type: {error_msg[:100]}"
+
+        if not healer.can_heal(error_type):
+            return False, f"Error type {error_type} not healable"
+
+        print(f"\n[HEAL] Attempting self-heal for: {error_type}")
+        print(f"[HEAL] Error: {error_msg[:200]}")
+
+        context = {"project_dir": AUTO_DEV_BASE.parent}
+        success, msg = healer.attempt_heal(pipeline_id, error_msg, context)
+
+        if success:
+            print(f"[HEAL] SUCCESS: {msg}")
+        else:
+            print(f"[HEAL] FAILED: {msg}")
+
+        return success, msg
 
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """执行质量检查（集成 quality_gate.py）"""
@@ -690,15 +903,52 @@ class PipelineRunner:
         # [MEMORY] Pipeline开始前检查记忆状态
         self._run_memory_management("status")
 
+        # [CHECKPOINT] 检查是否需要恢复 + 保存初始checkpoint
+        recovery_pipeline = self._check_recovery_needed()
+        if recovery_pipeline and recovery_pipeline != pipeline_id:
+            print(f"\n[RECOVERY] Found interrupted pipeline: {recovery_pipeline}")
+            print(f"[RECOVERY] Current pipeline will start fresh")
+
+        self._save_checkpoint(pipeline_id, "requirement", "started")
+
         results = {"pipeline_id": pipeline_id, "stages": {}}
 
         for stage in STAGES:
+            # [CHECKPOINT] 每个阶段开始时保存
+            self._save_checkpoint(pipeline_id, stage, "in_progress")
+
             ok, msg = self.run_stage(pipeline_id, stage)
             results["stages"][stage] = {"success": ok, "message": msg}
 
             if not ok:
-                print(f"\n[WARN] Pipeline stopped at {stage}: {msg}")
+                # [STUCK] 记录错误并检测是否卡死
+                is_stuck, stuck_msg = self._record_error_and_check_stuck(pipeline_id, msg)
+                self._save_checkpoint(pipeline_id, stage, "failed")
+
+                # [SELF-HEAL] 失败时先尝试自愈
+                heal_ok, heal_msg = self._try_self_heal(pipeline_id, msg)
+                if heal_ok:
+                    print(f"\n[HEAL] Self-heal succeeded, retrying stage: {stage}")
+                    # 重试一次
+                    ok, msg = self.run_stage(pipeline_id, stage)
+                    results["stages"][stage] = {"success": ok, "message": msg, "retry_after_heal": True}
+                    if ok:
+                        self._save_checkpoint(pipeline_id, stage, "healed")
+                        continue
+
+                if is_stuck:
+                    print(f"\n[STUCK] {stuck_msg}")
+                    print(f"[STUCK] Pipeline will be escalated for human intervention")
+                    results["stages"][stage]["stuck"] = True
+                else:
+                    print(f"\n[WARN] Pipeline stopped at {stage}: {msg}")
+
+                # [MEMORY] 失败时清理
+                self._run_memory_management("compact")
                 break
+
+            # [CHECKPOINT] 阶段成功后保存
+            self._save_checkpoint(pipeline_id, stage, "completed")
 
             # 阶段间质量门卫
             if stage in ["development", "testing"]:
@@ -707,6 +957,23 @@ class PipelineRunner:
                 if not gate_ok:
                     print(f"\n[FAIL] Quality gate failed: {gate_msg}")
                     results["stages"][stage]["success"] = False
+                    # [STUCK] 记录错误
+                    self._record_error_and_check_stuck(pipeline_id, gate_msg)
+                    self._save_checkpoint(pipeline_id, stage, "gate_failed")
+
+                    # [SELF-HEAL] 质量门禁失败时尝试自愈
+                    heal_ok, heal_msg = self._try_self_heal(pipeline_id, gate_msg)
+                    if heal_ok:
+                        print(f"\n[HEAL] Self-heal succeeded for quality gate, retrying check...")
+                        # 重试质量检查
+                        gate_ok, gate_msg = self.check_quality(pipeline_id, stage)
+                        results["stages"][stage]["quality_check"] = gate_ok
+                        results["stages"][stage]["retry_after_heal"] = True
+                        if gate_ok:
+                            results["stages"][stage]["success"] = True
+                            self._save_checkpoint(pipeline_id, stage, "healed")
+                            continue
+
                     break
 
                 # 开发阶段后进行代码审核（Reviewer）
@@ -728,17 +995,26 @@ class PipelineRunner:
                             print(f"\n[REVIEWER] [REJECTED] REJECTED - max iterations reached")
                             results["stages"][stage]["success"] = False
                             results["stages"][stage]["reviewer_result"] = "REJECTED"
+                            # [STUCK] 记录错误
+                            self._record_error_and_check_stuck(pipeline_id, "REJECTED")
+                            self._save_checkpoint(pipeline_id, stage, "review_rejected")
                             break
                         else:
                             print(f"\n[REVIEWER] [WARN] REVISION_REQUESTED - iteration {reviewer_iteration}")
+                            # [STUCK] 记录错误
+                            self._record_error_and_check_stuck(pipeline_id, reviewer_msg)
                             print(f"[REVIEWER] Waiting for code fixes...")
                             reviewer_iteration += 1
 
                     if reviewer_approved:
                         results["stages"][stage]["reviewer_result"] = "APPROVED"
                         print(f"[REVIEWER] Code review passed!")
-                    elif not results["stages"][stage].get("reviewer_result"):
-                        results["stages"][stage]["reviewer_result"] = "SKIPPED"
+
+                    # [CHECKPOINT] Reviewer完成后保存
+                    self._save_checkpoint(pipeline_id, stage, "review_passed" if reviewer_approved else "review_iterating")
+
+                    if not reviewer_approved and not results["stages"][stage].get("success"):
+                        break
 
             # [MEMORY] testing阶段后整理热层
             if stage == "testing":
@@ -747,6 +1023,13 @@ class PipelineRunner:
         # [MEMORY] Pipeline结束后清理冷层
         self._run_memory_management("cleanup")
         self._run_memory_management("status")
+
+        # [CHECKPOINT] Pipeline完成，清理状态
+        completed = sum(1 for s in results["stages"].values() if s.get("success"))
+        if completed == len(STAGES):
+            self._save_checkpoint(pipeline_id, "deployment", "completed")
+            self._clear_stuck_state(pipeline_id)
+            print(f"[CHECKPOINT] Pipeline completed successfully, state cleared")
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
