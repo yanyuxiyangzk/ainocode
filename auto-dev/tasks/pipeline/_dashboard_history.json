@@ -1,0 +1,116 @@
+[
+  {
+    "pipeline_id": "PIPELINE-20260408-030",
+    "requirement": "Second pipeline test",
+    "current_stage": "development",
+    "stages": {
+      "requirement": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "design": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "development": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "testing": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "deployment": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      }
+    },
+    "team": [],
+    "memory": {
+      "hot_lines": 16,
+      "warm_lines": 80,
+      "cold_files": 1
+    },
+    "activities": [
+      {
+        "time": "2026-04-08T18:04:16.532255",
+        "message": "Dev stage started",
+        "type": "info"
+      }
+    ],
+    "started_at": "2026-04-08T18:04:16.508555",
+    "last_updated": "2026-04-08T18:04:16.519054"
+  },
+  {
+    "pipeline_id": "PIPELINE-20260408-029",
+    "requirement": "Test history feature",
+    "current_stage": "design",
+    "stages": {
+      "requirement": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "design": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "development": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "testing": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      },
+      "deployment": {
+        "status": "pending",
+        "start_time": null,
+        "end_time": null,
+        "output": "",
+        "error": ""
+      }
+    },
+    "team": [],
+    "memory": {
+      "hot_lines": 16,
+      "warm_lines": 80,
+      "cold_files": 1
+    },
+    "activities": [
+      {
+        "time": "2026-04-08T18:04:03.644310",
+        "message": "Design stage started",
+        "type": "info"
+      }
+    ],
+    "started_at": "2026-04-08T18:04:03.621403",
+    "last_updated": "2026-04-08T18:04:03.631246"
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "name": "vue-aicoding-form-designer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue 3 Form Designer with drag-and-drop support",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "build:lib": "vue-tsc && vite build --mode lib",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "vue": "^3.4.21",
+    "naive-ui": "^2.38.1",
+    "pinia": "^2.1.7",
+    "vue-draggable-plus": "^0.5.3",
+    "@vueuse/core": "^10.9.0",
+    "@vicons/antd": "^0.12.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0",
+    "vue-tsc": "^2.0.6",
+    "typescript": "^5.4.2",
+    "sass": "^1.72.0",
+    "@types/node": "^20.11.30",
+    "vitest": "^1.4.0"
+  },
+  "keywords": [
+    "vue",
+    "form-designer",
+    "drag-and-drop",
+    "naive-ui",
+    "vue3"
+  ],
+  "author": "",
+  "license": "MIT"
+}

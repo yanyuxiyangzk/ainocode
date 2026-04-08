@@ -1,0 +1,190 @@
+// Mixins - 混合宏
+@use 'sass:color';
+
+// 清除浮动
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+// 文本省略
+@mixin text-ellipsis($line: 1) {
+  @if $line == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $line;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// 滚动条样式
+@mixin custom-scrollbar($width: 6px, $track-bg: transparent, $thumb-bg: #d9d9d9) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-bg;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-bg;
+    border-radius: $width * 0.5;
+
+    &:hover {
+      background: color.scale($thumb-bg, $lightness: -10%);
+    }
+  }
+}
+
+// Flex布局
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// 响应式断点
+@mixin media-up($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: 640px) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: 768px) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: 1024px) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: 1280px) { @content; }
+  }
+}
+
+// 禁用选中
+@mixin no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+// 禁用拖拽
+@mixin no-drag {
+  draggable: false;
+  -webkit-user-drag: none;
+}
+
+// 动画
+@mixin transition($properties: all) {
+  transition: $properties 0.15s ease;
+}
+
+// 按钮基础样式
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  height: 32px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  color: inherit;
+
+  &:hover:not(:disabled) {
+    color: #18a058;
+    border-color: #18a058;
+  }
+
+  &:active:not(:disabled) {
+    color: #0c7a43;
+    border-color: #0c7a43;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// 输入框基础样式
+@mixin input-base {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: #36c77b;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #18a058;
+    box-shadow: 0 0 0 2px rgba(24, 160, 88, 0.1);
+  }
+
+  &:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+  }
+}
+
+// 面板基础样式
+@mixin panel-base {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// 工具栏按钮
+@mixin toolbar-button {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #666666;
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.06);
+    color: #18a058;
+  }
+
+  &:active:not(:disabled) {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
