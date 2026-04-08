@@ -51,6 +51,9 @@ PACE_STATE_FILE = STATE_DIR / "pace-state.json"
 PACE_CONTROL_SCRIPT = SCRIPTS_DIR / "pace_control.py"
 NOTIFICATION_SCRIPT = SCRIPTS_DIR / "notification_ops.py"
 
+# Dashboard status file
+DASHBOARD_STATUS_FILE = PIPELINES_DIR / "_current_status.json"
+
 # 阶段定义
 STAGES = ["requirement", "design", "development", "testing", "deployment"]
 STAGE_NAMES = {
@@ -628,6 +631,77 @@ class PipelineRunner:
         except Exception as e:
             print(f"[WARN] Notification error: {e}")
 
+    def _update_dashboard_status(self, pipeline_id: str, current_stage: str = None, activity: str = None):
+        """
+        [DASHBOARD] 更新可视化状态文件
+        生成 dashboard.html 读取的 _current_status.json
+        """
+        try:
+            pipeline = self.get_pipeline(pipeline_id)
+            if not pipeline:
+                return
+
+            # 构建状态数据
+            status = {
+                "pipeline_id": pipeline_id,
+                "requirement": pipeline.get("requirement", ""),
+                "current_stage": current_stage or pipeline.get("current_stage", ""),
+                "stages": {},
+                "team": [],
+                "memory": {"hot_lines": 0, "warm_lines": 0, "cold_files": 0},
+                "activities": [],
+                "started_at": pipeline.get("created_at"),
+                "last_updated": datetime.now().isoformat()
+            }
+
+            # 填充阶段状态
+            for stage_name, stage_info in pipeline.get("stages", {}).items():
+                status["stages"][stage_name] = {
+                    "status": stage_info.get("status", "pending"),
+                    "start_time": stage_info.get("start_time"),
+                    "end_time": stage_info.get("end_time"),
+                    "output": stage_info.get("output", "")[:100] if stage_info.get("output") else "",
+                    "error": stage_info.get("error", "")[:100] if stage_info.get("error") else ""
+                }
+
+            # 填充团队信息
+            team_config_path = TEAMS_DIR / f"team-{pipeline_id}.json"
+            if team_config_path.exists():
+                try:
+                    with open(team_config_path, "r", encoding="utf-8") as f:
+                        team_data = json.load(f)
+                        status["team"] = team_data.get("members", [])
+                except:
+                    pass
+
+            # 填充记忆状态
+            from memory.memory_tier_manager import MemoryTierManager
+            try:
+                mem_mgr = MemoryTierManager()
+                mem_status = mem_mgr.status()
+                status["memory"] = {
+                    "hot_lines": mem_status.get("hot", {}).get("lines", 0),
+                    "warm_lines": mem_status.get("warm", {}).get("lines", 0),
+                    "cold_files": mem_status.get("cold", {}).get("files", 0)
+                }
+            except:
+                pass
+
+            # 添加活动记录
+            if activity:
+                status["activities"] = [{
+                    "time": datetime.now().isoformat(),
+                    "message": activity,
+                    "type": "info"
+                }]
+
+            # 写入状态文件
+            with open(DASHBOARD_STATUS_FILE, "w", encoding="utf-8") as f:
+                json.dump(status, f, ensure_ascii=False, indent=2)
+
+        except Exception as e:
+            print(f"[WARN] Dashboard status update failed: {e}")
+
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """执行质量检查（集成 quality_gate.py）"""
         pipeline_dir = self.pipelines_dir / pipeline_id
@@ -999,6 +1073,9 @@ class PipelineRunner:
         # [MEMORY] Pipeline开始前检查记忆状态
         self._run_memory_management("status")
 
+        # [DASHBOARD] 初始化仪表盘状态
+        self._update_dashboard_status(pipeline_id, "requirement", f"Pipeline started: {pipeline['requirement'][:50]}")
+
         # [CHECKPOINT] 检查是否需要恢复 + 保存初始checkpoint
         recovery_pipeline = self._check_recovery_needed()
         if recovery_pipeline and recovery_pipeline != pipeline_id:
@@ -1012,6 +1089,9 @@ class PipelineRunner:
         for stage in STAGES:
             # [CHECKPOINT] 每个阶段开始时保存
             self._save_checkpoint(pipeline_id, stage, "in_progress")
+
+            # [DASHBOARD] 更新阶段状态
+            self._update_dashboard_status(pipeline_id, stage, f"Stage {stage} started")
 
             ok, msg = self.run_stage(pipeline_id, stage)
             results["stages"][stage] = {"success": ok, "message": msg}
@@ -1135,10 +1215,14 @@ class PipelineRunner:
             self._record_pace_end(pipeline_id, success=True)
             # [NOTIFY] 发送完成通知
             self._notify("pipeline_complete", f"Pipeline {pipeline_id} completed successfully: {completed}/{len(STAGES)} stages")
+            # [DASHBOARD] 更新完成状态
+            self._update_dashboard_status(pipeline_id, "deployment", f"Pipeline completed successfully!")
             print(f"[CHECKPOINT] Pipeline completed successfully, state cleared")
         else:
             # [PACE] 记录任务失败结束
             self._record_pace_end(pipeline_id, success=False)
+            # [DASHBOARD] 更新失败状态
+            self._update_dashboard_status(pipeline_id, "failed", f"Pipeline failed at stage {stage}")
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
