@@ -45,6 +45,11 @@ MEMORY_TIER_MANAGER = MEMORY_DIR / "memory_tier_manager.py"
 STATE_DIR = AUTO_DEV_BASE / "self-improving"
 CHECKPOINT_FILE = STATE_DIR / "checkpoint.json"
 STUCK_STATE_FILE = STATE_DIR / "stuck-state.json"
+PACE_STATE_FILE = STATE_DIR / "pace-state.json"
+
+# External scripts
+PACE_CONTROL_SCRIPT = SCRIPTS_DIR / "pace_control.py"
+NOTIFICATION_SCRIPT = SCRIPTS_DIR / "notification_ops.py"
 
 # 阶段定义
 STAGES = ["requirement", "design", "development", "testing", "deployment"]
@@ -541,6 +546,88 @@ class PipelineRunner:
 
         return success, msg
 
+    # ==================== Pace Control & Notification ====================
+
+    def _check_pace_and_wait(self, pipeline_id: str) -> Tuple[bool, str]:
+        """
+        [PACE] 检查是否允许启动新Pipeline
+        防止API限流：5小时窗口最多3个任务，30分钟冷却
+        """
+        if not PACE_CONTROL_SCRIPT.exists():
+            return True, "pace_control not available, proceeding"
+
+        try:
+            result = subprocess.run(
+                [sys.executable, str(PACE_CONTROL_SCRIPT), "check", pipeline_id],
+                capture_output=True, text=True, timeout=30
+            )
+
+            if result.returncode == 0:
+                return True, "pace check OK"
+
+            # 被限流
+            message = result.stdout.strip() if result.stdout else result.stderr.strip()[:200]
+            print(f"\n[PACE] Rate limited: {message}")
+
+            # 尝试等待冷却
+            wait_result = subprocess.run(
+                [sys.executable, str(PACE_CONTROL_SCRIPT), "wait", pipeline_id],
+                capture_output=True, text=True, timeout=60
+            )
+
+            if wait_result.returncode == 0:
+                print(f"[PACE] Cooldown complete, proceeding")
+                return True, "proceeding after cooldown"
+
+            return False, f"Rate limited: {message}"
+
+        except Exception as e:
+            print(f"[WARN] Pace check error: {e}")
+            return True, f"pace check error, proceeding: {e}"
+
+    def _record_pace_start(self, pipeline_id: str):
+        """[PACE] 记录任务开始"""
+        if not PACE_CONTROL_SCRIPT.exists():
+            return
+
+        try:
+            subprocess.run(
+                [sys.executable, str(PACE_CONTROL_SCRIPT), "start", pipeline_id],
+                capture_output=True, text=True, timeout=30
+            )
+        except:
+            pass
+
+    def _record_pace_end(self, pipeline_id: str, success: bool = True):
+        """[PACE] 记录任务结束"""
+        if not PACE_CONTROL_SCRIPT.exists():
+            return
+
+        status = "success" if success else "failed"
+        try:
+            subprocess.run(
+                [sys.executable, str(PACE_CONTROL_SCRIPT), "end", pipeline_id, status],
+                capture_output=True, text=True, timeout=30
+            )
+        except:
+            pass
+
+    def _notify(self, event_type: str, message: str):
+        """
+        [NOTIFY] 发送通知（Discord webhook）
+        静默模式：webhook未配置时不发送
+        """
+        if not NOTIFICATION_SCRIPT.exists():
+            return
+
+        try:
+            subprocess.run(
+                [sys.executable, str(NOTIFICATION_SCRIPT), "send", event_type, message],
+                capture_output=True, text=True, timeout=10
+            )
+        except Exception as e:
+            print(f"[WARN] Notification error: {e}")
+
     def check_quality(self, pipeline_id: str, stage: str) -> Tuple[bool, str]:
         """执行质量检查（集成 quality_gate.py）"""
         pipeline_dir = self.pipelines_dir / pipeline_id
@@ -900,6 +987,15 @@ class PipelineRunner:
         print(f"Requirement: {pipeline['requirement']}")
         print("=" * 60)
 
+        # [PACE] 检查是否允许启动
+        pace_ok, pace_msg = self._check_pace_and_wait(pipeline_id)
+        if not pace_ok:
+            print(f"[PACE] Cannot start pipeline: {pace_msg}")
+            return {"error": f"Rate limited: {pace_msg}"}
+
+        # [PACE] 记录任务开始
+        self._record_pace_start(pipeline_id)
+
         # [MEMORY] Pipeline开始前检查记忆状态
         self._run_memory_management("status")
 
@@ -940,8 +1036,12 @@ class PipelineRunner:
                     print(f"\n[STUCK] {stuck_msg}")
                     print(f"[STUCK] Pipeline will be escalated for human intervention")
                     results["stages"][stage]["stuck"] = True
+                    # [NOTIFY] 发送卡死通知
+                    self._notify("stuck_detected", f"Pipeline {pipeline_id} stuck at {stage}: {stuck_msg}")
                 else:
                     print(f"\n[WARN] Pipeline stopped at {stage}: {msg}")
+                    # [NOTIFY] 发送阻塞通知
+                    self._notify("pipeline_blocked", f"Pipeline {pipeline_id} blocked at {stage}: {msg}")
 
                 # [MEMORY] 失败时清理
                 self._run_memory_management("compact")
@@ -1026,10 +1126,19 @@ class PipelineRunner:
 
         # [CHECKPOINT] Pipeline完成，清理状态
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
-        if completed == len(STAGES):
+        is_full_success = completed == len(STAGES)
+
+        if is_full_success:
             self._save_checkpoint(pipeline_id, "deployment", "completed")
             self._clear_stuck_state(pipeline_id)
+            # [PACE] 记录任务成功结束
+            self._record_pace_end(pipeline_id, success=True)
+            # [NOTIFY] 发送完成通知
+            self._notify("pipeline_complete", f"Pipeline {pipeline_id} completed successfully: {completed}/{len(STAGES)} stages")
             print(f"[CHECKPOINT] Pipeline completed successfully, state cleared")
+        else:
+            # [PACE] 记录任务失败结束
+            self._record_pace_end(pipeline_id, success=False)
 
         # 总结
         completed = sum(1 for s in results["stages"].values() if s.get("success"))
